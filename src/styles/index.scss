@@ -1,0 +1,14 @@
+@import './reset.local.scss';
+@import url('https://fonts.googleapis.com/css2?family=Raleway:wght@400;500;600;700&display=swap');
+
+html,
+body {
+  height: 100%;
+  overflow: hidden;
+  font-family: 'Raleway', sans-serif;
+}
+
+#app {
+  overflow: hidden;
+  min-height: 100vh;
+}
