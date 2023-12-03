@@ -17,6 +17,11 @@ const router = createRouter({
       children: [
         {
           path: '',
+          name: 'main',
+          component: MainPage
+        },
+        {
+          path: 'sign-in',
           name: 'sign-in',
           component: SignInPage,
           meta: { noAuth: true }
@@ -26,11 +31,6 @@ const router = createRouter({
           name: 'sign-up',
           component: SignUpPage,
           meta: { noAuth: true }
-        },
-        {
-          path: 'chats',
-          name: 'chats',
-          component: MainPage,
         }
       ]
     },

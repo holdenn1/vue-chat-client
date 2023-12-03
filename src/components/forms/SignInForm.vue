@@ -14,34 +14,42 @@
       label="Password"
       placeholder="Input your password"
     />
-    <div class="submit-btn-wrapper">
-      <SubmitButton />
-    </div>
+    <SubmitButton submit-button-text="Sign in">
+      <template #img>
+
+        <img style="width: 24px;" src="@/icons/icons8-send.png"/>
+      </template>
+    </SubmitButton> 
   </form>
 </template>
 
 <script setup lang="ts">
-import SubmitButton from 'ui/buttons/SubmitFormButton.vue'
+import CustomFormInput from 'ui/inputs/CustomFormInput.vue'
+import SubmitButton from 'ui/buttons/SubmitButton.vue'
 
-// import validationSchema from '@/utils/validate/authValidateSchema'
+import validationSchema from '@/utils/validate/authValidationShema'
 // import { useUserStore } from '@/store/userStore'
 
-import { ref } from 'vue'
 import { useForm } from 'vee-validate'
 
-import { useMainStore } from '@/store/mainStore'
-import type { InitialValuesSignInForm } from './types'
+// import { useMainStore } from '@/store/mainStore'
 
-const isShowEmailConfirmMessage = ref<boolean>(false)
-const userStore = useUserStore()
-const mainStore = useMainStore()
+type InitialValuesSignInForm = {
+  email: string
+  password: string
+}
 
-const { values, handleSubmit } = useForm<InitialValuesSignInForm>({
+// const userStore = useUserStore()
+// const mainStore = useMainStore()
+
+const { values, handleSubmit,  } = useForm<InitialValuesSignInForm>({
   validationSchema
 })
 
 const onSubmit = handleSubmit(async (values, { resetForm }) => {
-  await userStore.loginUser({ data: values, resetForm, isShowEmailConfirmMessage })
+  console.log(values);
+  resetForm()
+  // await userStore.loginUser({ data: values })
 })
 </script>
 
@@ -52,10 +60,7 @@ const onSubmit = handleSubmit(async (values, { resetForm }) => {
   max-height: 380px;
   margin: 0 20px;
 
-  .submit-btn-wrapper {
-    @include flexCenter;
-    margin-bottom: 10px;
-  }
+
   .forget-password {
     text-align: center;
     &__text {
