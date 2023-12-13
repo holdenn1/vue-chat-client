@@ -2,18 +2,18 @@
   <form class="sign-up-form" @submit="onSubmit">
     <CustomFormInput
       :value="values.nickname"
-      name="firstName"
+      name="nickname"
       type="text"
-      label="First name"
-      placeholder="Input your first name"
+      label="Nickname"
+      placeholder="Input your nickname"
     />
 
     <CustomFormInput
       :value="values.email"
-      name="lastName"
+      name="email"
       type="email"
-      label="Last name"
-      placeholder="Input your last name"
+      label="Email"
+      placeholder="Input your last email"
     />
     <CustomFormInput
       :value="values.password"
@@ -32,11 +32,9 @@
     />
     <SubmitButton submit-button-text="Sign up">
       <template #img>
-
-        <img style="width: 24px;" src="@/icons/icons8-send.png"/>
+        <img style="width: 24px" src="@/icons/icons8-send.png" />
       </template>
-    </SubmitButton> 
-    
+    </SubmitButton>
   </form>
 </template>
 
@@ -44,23 +42,17 @@
 import CustomFormInput from 'ui/inputs/CustomFormInput.vue'
 import SubmitButton from 'ui/buttons/SubmitButton.vue'
 
-
 import validationSchema from '@/utils/validate/registrationValidateSchema'
-// import { useUserStore } from '@/store/userStore'
+import { useUserStore } from '@/store/userStore'
 
-// import { useToastify } from 'vue-toastify-3'
 import { useForm } from 'vee-validate'
-
+import type { RegistrationUserData } from '@/api/requests/types'
 
 export type InitialValuesSignUpForm = {
-  nickname: string
-  email: string
-  password: string
   confirmPassword: string
-}
+} & RegistrationUserData
 
-// const userStore = useUserStore()
-// const { toastify } = useToastify()
+const userStore = useUserStore()
 
 const { values, handleSubmit } = useForm<InitialValuesSignUpForm>({
   validationSchema,
@@ -71,12 +63,11 @@ const onSubmit = handleSubmit(async (values, { resetForm }) => {
   const { confirmPassword, ...data }: InitialValuesSignUpForm = {
     ...values
   }
-  console.log(data);
+
+  await userStore.registrationUser({
+    data
+  })
   resetForm()
-  
-  // await userStore.registrationUser({
-  //   data
-  // })
 })
 </script>
 
@@ -86,6 +77,5 @@ const onSubmit = handleSubmit(async (values, { resetForm }) => {
   width: 720px;
   max-height: 380px;
   margin: 0 20px;
- 
 }
 </style>

@@ -1,5 +1,5 @@
 <template>
-  <Toastify />
+  <!-- <Toastify /> -->
   <div class="main-wrapper">
     <router-view />
   </div>

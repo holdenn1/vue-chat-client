@@ -1,6 +1,7 @@
 import SignInPage from '@/pages/SignInPage.vue'
 import SignUpPage from '@/pages/SignUpPage.vue'
 import MainPage from '@/pages/MainPage.vue'
+import ChatsPage from '@/pages/ChatsPage.vue'
 import MainLayout from 'components/Layouts/MainLayout.vue'
 
 import NotFound from 'components/errors/NotFound.vue'
@@ -31,6 +32,12 @@ const router = createRouter({
           name: 'sign-up',
           component: SignUpPage,
           meta: { noAuth: true }
+        },
+        {
+          path: 'chats',
+          name: 'chats',
+          component: ChatsPage,
+   
         }
       ]
     },

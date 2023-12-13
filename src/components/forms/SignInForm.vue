@@ -28,19 +28,17 @@ import CustomFormInput from 'ui/inputs/CustomFormInput.vue'
 import SubmitButton from 'ui/buttons/SubmitButton.vue'
 
 import validationSchema from '@/utils/validate/authValidationShema'
-// import { useUserStore } from '@/store/userStore'
+import { useUserStore } from '@/store/userStore'
 
 import { useForm } from 'vee-validate'
 
-// import { useMainStore } from '@/store/mainStore'
 
-type InitialValuesSignInForm = {
+export type InitialValuesSignInForm = {
   email: string
   password: string
 }
 
-// const userStore = useUserStore()
-// const mainStore = useMainStore()
+const userStore = useUserStore()
 
 const { values, handleSubmit,  } = useForm<InitialValuesSignInForm>({
   validationSchema
@@ -48,8 +46,8 @@ const { values, handleSubmit,  } = useForm<InitialValuesSignInForm>({
 
 const onSubmit = handleSubmit(async (values, { resetForm }) => {
   console.log(values);
+  await userStore.loginUser({ data: values })
   resetForm()
-  // await userStore.loginUser({ data: values })
 })
 </script>
 
