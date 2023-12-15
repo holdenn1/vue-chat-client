@@ -1,7 +1,8 @@
 <template>
   <div class="search-member">
     <SearchUserByNicknameInputVue
-      :searchMemberValue="searchMemberValue"
+      :clear-members="clearMembers"
+      :search-member-value="searchMemberValue"
       :handleInput="handleInput"
       placeholder="Input user nickname"
     />
@@ -17,12 +18,17 @@ const searchMemberValue = ref('')
 
 const membersStore = useMembersStore()
 
-async function handleInput(e: Event) {
+function handleInput(e: Event) {
   const value = (e.target as HTMLInputElement).value.toLowerCase()
   searchMemberValue.value = value
-  // dispatch(setSelectedMembersVisible(false))
-  // dispatch(setRecomendationMemberVisible(true))
+  membersStore.setRecommendationMemberVisible(true)
   membersStore.searsMembersByEmail(value)
+}
+
+function clearMembers(){
+  membersStore.setRecommendationMembers([])
+  membersStore.setRecommendationMemberVisible(false)
+  searchMemberValue.value = ''
 }
 </script>
 
@@ -30,5 +36,6 @@ async function handleInput(e: Event) {
 .search-member {
   padding: 30px 10px 20px;
   border-bottom: 1px solid rgb(76, 76, 76);
+  position: relative;
 }
 </style>

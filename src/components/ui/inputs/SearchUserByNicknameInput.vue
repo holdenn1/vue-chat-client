@@ -7,15 +7,18 @@
       type="text"
       :placeholder="placeholder"
     />
+    <img class="clear-found-members" @click="clearMembers" :src="clearFoundMembers" alt="" />
   </div>
 </template>
 
 <script setup lang="ts">
 import { toRefs } from 'vue'
+import clearFoundMembers from '@/icons/icons8-clear.svg'
 
 const props = defineProps<{
   searchMemberValue: string
   handleInput(e: Event): void
+  clearMembers(): void
   placeholder?: string
 }>()
 
@@ -30,6 +33,7 @@ defineEmits<{
 @import '@/styles/mixins/input.scss';
 .form-input {
   width: 100%;
+  position: relative;
 
   .input {
     padding: 10px 8px;
@@ -40,7 +44,7 @@ defineEmits<{
     border-radius: 12px;
     background: url('@/icons/icons8-search.svg') no-repeat scroll 6px 6px;
     padding-left: 36px;
-
+    background-color: #c0d5eb;
     &:-webkit-autofill,
     &:-webkit-autofill:hover,
     &:-webkit-autofill:focus,
@@ -55,6 +59,12 @@ defineEmits<{
       -webkit-appearance: none;
       margin: 0;
     }
+  }
+  .clear-found-members {
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translate(0, -50%);
   }
 }
 </style>

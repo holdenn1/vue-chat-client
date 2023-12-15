@@ -1,0 +1,40 @@
+<template>
+  <div class="recommendation-members">
+    <img
+      class="member-avatar"
+      :src="!memberAvatar?.length || !memberAvatar ? userPreviewAvatar : memberAvatar"
+      alt=""
+    />
+    <span class="member-name">{{ memberNickname }}</span>
+  </div>
+</template>
+
+<script setup lang="ts">
+import userPreviewAvatar from '@/icons/icons8-user-48.png'
+defineProps<{ memberAvatar: string; memberNickname: string }>()
+</script>
+
+<style lang="scss" scoped>
+
+.recommendation-members{
+  display: flex;
+  align-items: center;
+  padding: 0 10px;
+  overflow: hidden;
+  border-bottom: 1px solid rgb(76, 76, 76);
+  padding: 6px;
+  cursor: pointer;
+  transition: 0.3s;
+  &:hover{
+    background-color: #9d8ee0;
+  }
+  .member-avatar{
+    width: 48px;
+    height: 48px;
+    border-radius: 100%;
+    object-fit: cover;
+    margin-right: 12px;
+  }
+  
+}
+</style>

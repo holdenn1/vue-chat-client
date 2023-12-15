@@ -2,12 +2,12 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import type { User } from './types/userStoreTypes'
 import { searchMembersByNickname } from '@/api/requests'
+import type { InitialValuesMembersStore } from './types/membersStoreTypes'
 
 export const useMembersStore = defineStore('member', () => {
-  const membersState = ref<{
-    recommendationMembers: User[]
-  }>({
-    recommendationMembers: []
+  const membersState = ref<InitialValuesMembersStore>({
+    recommendationMembers: [],
+    isRecommendationMembers: false
   })
 
   const debounceTimeoutRef = ref<number | null>(null)
@@ -19,13 +19,12 @@ export const useMembersStore = defineStore('member', () => {
       }
       debounceTimeoutRef.value = setTimeout(async () => {
         if (value.trim() !== '') {
-          const {data}: {data: User[]} = await searchMembersByNickname(value)
+          const { data }: { data: User[] } = await searchMembersByNickname(value)
 
-          console.log(data);
-          
-          setRecommendationMembersList(data)
+          membersState.value.recommendationMembers = data
         } else {
-          setRecommendationMembersList([])
+          membersState.value.recommendationMembers = []
+          setRecommendationMemberVisible(false)
         }
       }, 500)
     } catch (e) {
@@ -33,10 +32,18 @@ export const useMembersStore = defineStore('member', () => {
     }
   }
 
-  function setRecommendationMembersList(members: User[]) {
+  function setRecommendationMemberVisible(value: boolean) {
+    membersState.value.isRecommendationMembers = value
+  }
+
+  function setRecommendationMembers(members: User[]) {
     membersState.value.recommendationMembers = members
   }
 
-
-  return { membersState, searsMembersByEmail, setRecommendationMembersList }
+  return {
+    membersState,
+    searsMembersByEmail,
+    setRecommendationMemberVisible,
+    setRecommendationMembers
+  }
 })

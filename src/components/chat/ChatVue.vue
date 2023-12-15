@@ -1,11 +1,13 @@
 <template>
   <div class="chat-wrapper">
-    <ChatsBar/>
+    <ChatsBar />
+    <ChatContent />
   </div>
 </template>
 
 <script setup lang="ts">
-import ChatsBar from './ChatsBar.vue';
+import ChatContent from './ChatContent.vue'
+import ChatsBar from './ChatsBar.vue'
 </script>
 
 <style lang="scss" scoped>
@@ -16,5 +18,13 @@ import ChatsBar from './ChatsBar.vue';
   border: 1px solid rgb(92, 92, 92);
   border-radius: 12px;
   box-shadow: 1px 1px 20px 2px rgba(59, 59, 59, 0.75);
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: minmax(200px, 320px) 1fr ;
+  grid-template-rows: 1fr;
+  gap: 0px 0px;
+  grid-template-areas:
+    'chat-bar chat-content'
+    'chat-bar chat-content';
 }
 </style>
