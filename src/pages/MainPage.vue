@@ -3,7 +3,7 @@
     <div class="main-page__content">
       <h2 class="main-page__title">Glad to see you!</h2>
       <div class="main-page-navigation">
-        <a class="main-page-navigation__google-link" href="">
+        <a class="main-page-navigation__google-link" :href="GOOGLE_AUTH">
           <img src="@/icons/icons8-google.svg" /> Continue with Google</a
         >
         <router-link class="main-page-navigation__sign-up-link" :to="{ name: 'sign-in' }"
@@ -15,7 +15,10 @@
   </div>
 </template>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+
+const GOOGLE_AUTH = 'http://localhost:8000/auth/google/redirect'
+</script>
 
 <style lang="scss" scoped>
 @import '@/styles/mixins/d-flex-ctr.scss';

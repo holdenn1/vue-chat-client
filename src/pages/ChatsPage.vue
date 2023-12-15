@@ -1,19 +1,18 @@
 <template>
-  <div>
-    <button
-      style="margin: 100px; border: 1px solid black; width: 100px; height: 50px"
-      type="button"
-      @click="() => userStore.logoutUser()"
-    >
-      logout
-    </button>
+  <div class="chat-page-wrapper">
+    <ChatVue />
   </div>
 </template>
 
 <script setup lang="ts">
-import { useUserStore } from '@/store/userStore'
-
-const userStore = useUserStore()
+import ChatVue from 'components/chat/ChatVue.vue'
 </script>
 
-<style scoped></style>
+<style lang="scss" scoped>
+@import '@/styles/mixins/d-flex-ctr.scss';
+.chat-page-wrapper {
+  width: 100%;
+  height: 100%;
+  @include flexCenter;
+}
+</style>
