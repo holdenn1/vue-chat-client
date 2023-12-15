@@ -23,6 +23,14 @@
       >
         No chats Found
       </ChatError>
+      <ChatError
+        v-show="
+          membersStore.membersState.isRecommendationMembers &&
+          !membersStore.membersState.recommendationMembers.length
+        "
+      >
+        Members not found
+      </ChatError>
     </div>
   </div>
 </template>
