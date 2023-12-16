@@ -27,7 +27,6 @@ export const useUserStore = defineStore('user', () => {
     user: null
   })
 
-
   async function registrationUser({ data }: RegistrationUserActionProps) {
     try {
       const { data: user }: { data: User } = await registrationUserRequest(data)
@@ -100,8 +99,6 @@ export const useUserStore = defineStore('user', () => {
       userState.value.user = data
     }
   }
-
- 
 
   return {
     userState,

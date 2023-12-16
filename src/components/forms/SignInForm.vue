@@ -14,7 +14,7 @@
       label="Password"
       placeholder="Input your password"
     />
-    <SubmitButton submit-button-text="Sign in">
+    <SubmitButton :is-submitting="isSubmitting" submit-button-text="Sign in">
       <template #img>
 
         <img style="width: 24px;" src="@/icons/icons8-send.png"/>
@@ -40,7 +40,7 @@ export type InitialValuesSignInForm = {
 
 const userStore = useUserStore()
 
-const { values, handleSubmit,  } = useForm<InitialValuesSignInForm>({
+const { values, handleSubmit, isSubmitting } = useForm<InitialValuesSignInForm>({
   validationSchema
 })
 

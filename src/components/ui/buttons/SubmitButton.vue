@@ -1,6 +1,6 @@
 <template>
   <div class="submit-btn-wrapper">
-    <button class="submit-button" type="submit">
+    <button :disabled="isSubmitting" class="submit-button" type="submit">
       <span>{{ submitButtonText }}</span>
 
       <slot name="img" />
@@ -9,7 +9,11 @@
 </template>
 
 <script setup lang="ts">
-defineProps<{ submitButtonText: string }>()
+import { toRefs } from 'vue';
+
+const props = defineProps<{ submitButtonText: string , isSubmitting: boolean}>()
+
+const {isSubmitting} = toRefs(props)
 </script>
 
 <style lang="scss" scoped>

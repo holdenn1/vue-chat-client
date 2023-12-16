@@ -1,6 +1,6 @@
 import instance from '@/api'
 import axios from 'axios'
-import type { LoginUserData, RegistrationUserData } from './types'
+import type { LoginUserData, RegistrationUserData, SendMessageData } from './types'
 
 const BASE_URL = 'http://localhost:8000/'
 
@@ -17,4 +17,7 @@ export const refreshTokensLogin = () => instance.get('auth/token/refresh/refresh
 
 //
 
-export const searchMembersByNickname = (nickname:string) => instance.get(`user/search-users?nickname=${nickname}`)
+export const searchMembersByNickname = (nickname: string) =>
+  instance.get(`user/search-users?nickname=${nickname}`)
+
+export const sendMessageRequest = (data: SendMessageData) => instance.post(`chat/send-message`, data)

@@ -1,13 +1,41 @@
 <template>
-  <form class="chat-message-form">
-    <textarea class="chat-input" id="" cols="30" rows="10"></textarea>
-    <button class="send-message-btn">
+  <form @submit="onSubmit" class="chat-message-form">
+    <textarea v-model="message" v-bind="messageAtr" class="chat-input" />
+    <button type="submit" class="send-message-btn" :disabled="isSubmitting">
       <img src="@/icons/icons8-send-30.png" alt="sent" />
     </button>
   </form>
 </template>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { useChatStore } from '@/store/chatStore'
+
+import { useForm } from 'vee-validate'
+import * as yup from 'yup'
+
+const props = defineProps<{ recipientId: number | undefined }>()
+
+const chatStore = useChatStore()
+
+const { handleSubmit, defineField, isSubmitting } = useForm({
+  initialValues: { message: '' },
+  validationSchema: yup.object({
+    message: yup.string().trim()
+  })
+})
+
+const [message, messageAtr] = defineField('message')
+
+const onSubmit = handleSubmit(async ({ message }, { resetForm }) => {
+  if (!message.length) return
+
+  if (props.recipientId) {
+    chatStore.sendMessage(props.recipientId, message)
+  }
+
+  resetForm()
+})
+</script>
 
 <style lang="scss" scoped>
 .chat-message-form {

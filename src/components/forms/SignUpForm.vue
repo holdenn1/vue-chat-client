@@ -30,7 +30,7 @@
       label="Confirm password"
       placeholder="Confirm your password"
     />
-    <SubmitButton submit-button-text="Sign up">
+    <SubmitButton :is-submitting="isSubmitting" submit-button-text="Sign up">
       <template #img>
         <img style="width: 24px" src="@/icons/icons8-send.png" />
       </template>
@@ -54,7 +54,7 @@ export type InitialValuesSignUpForm = {
 
 const userStore = useUserStore()
 
-const { values, handleSubmit } = useForm<InitialValuesSignUpForm>({
+const { values, handleSubmit, isSubmitting } = useForm<InitialValuesSignUpForm>({
   validationSchema,
   keepValuesOnUnmount: true
 })

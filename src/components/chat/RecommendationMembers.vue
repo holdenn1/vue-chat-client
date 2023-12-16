@@ -1,22 +1,22 @@
 <template>
   <div class="recommendation-members">
-    <img
-      class="member-avatar"
-      :src="!memberAvatar?.length || !memberAvatar ? userPreviewAvatar : memberAvatar"
-      alt=""
-    />
+    <img class="member-avatar" :src="userAvatar" alt="" />
     <span class="member-name">{{ memberNickname }}</span>
   </div>
 </template>
 
 <script setup lang="ts">
 import userPreviewAvatar from '@/icons/icons8-user-48.png'
-defineProps<{ memberAvatar: string; memberNickname: string }>()
+import { computed } from 'vue'
+const props = defineProps<{ memberAvatar: string; memberNickname: string }>()
+
+const userAvatar = computed(() => {
+  return !props.memberAvatar?.length || !props.memberAvatar ? userPreviewAvatar : props.memberAvatar
+})
 </script>
 
 <style lang="scss" scoped>
-
-.recommendation-members{
+.recommendation-members {
   display: flex;
   align-items: center;
   padding: 0 10px;
@@ -25,16 +25,15 @@ defineProps<{ memberAvatar: string; memberNickname: string }>()
   padding: 6px;
   cursor: pointer;
   transition: 0.3s;
-  &:hover{
+  &:hover {
     background-color: #9d8ee0;
   }
-  .member-avatar{
+  .member-avatar {
     width: 48px;
     height: 48px;
     border-radius: 100%;
     object-fit: cover;
     margin-right: 12px;
   }
-  
 }
 </style>
