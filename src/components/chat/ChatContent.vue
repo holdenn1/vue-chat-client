@@ -21,7 +21,7 @@
           ]"
         >
           <p>{{ message.message }}</p>
-          <span class="message-date"></span>
+          <span class="message-date">22:00</span>
         </div>
       </div>
       <div class="chat-message-form-wrapper">
@@ -36,13 +36,27 @@ import ChatForm from 'components/forms/ChatForm.vue'
 import ChatError from '../errors/ChatError.vue'
 
 import { useChatStore } from '@/store/chatStore'
-import type { User } from '@/store/types/userStoreTypes'
 import { useUserStore } from '@/store/userStore'
+import { useRoute } from 'vue-router'
+import { watch } from 'vue'
+import type { User } from '@/store/types/userStoreTypes'
 
 defineProps<{ currentMember: User | undefined }>()
 
 const chatStore = useChatStore()
 const userStore = useUserStore()
+
+const route = useRoute()
+
+watch(
+  () => route.query,
+  async () => {
+    if (route.query.chatId) {
+
+      chatStore.fetchMessages(route.query.chatId as string)
+    }
+  }
+)
 </script>
 
 <style lang="scss" scoped>
@@ -61,6 +75,7 @@ const userStore = useUserStore()
       width: 100%;
       height: 88.5px;
       background-color: rgb(73, 10, 144);
+      flex-shrink: 0;
       @include flexCenter;
       .member-wrapper {
         display: flex;
@@ -73,6 +88,7 @@ const userStore = useUserStore()
         }
         .member-name {
           font-size: 18px;
+          color: white;
         }
       }
     }
@@ -87,19 +103,25 @@ const userStore = useUserStore()
       .message-of-sender {
         background-color: #679ce3;
         margin-left: auto;
+        text-align: right;
       }
       .message-of-recipient {
         background-color: #2baadd;
         margin-right: auto;
+        text-align: left;
       }
 
       .message-of-recipient,
       .message-of-sender {
         max-width: 80%;
-        padding: 10px 10px 22px;
+        min-width: 60px;
+        padding: 10px 10px 24px;
         margin-top: 14px;
         border-radius: 12px;
         position: relative;
+        font-weight: 500;
+        line-height: 120%;
+        
         .message-date {
           position: absolute;
           bottom: 4px;

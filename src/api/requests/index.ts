@@ -25,3 +25,5 @@ export const searchMembersByNickname = (nickname: string) =>
 export const sendMessageRequest = (data: SendMessageData) => instance.post(`chat/send-message`, data)
 
 export const fetchChatsRequest = () => instance.get('chat/get-chats')
+
+export const fetchMessagesRequest = (chatId:string) => instance.get(`chat/get-messages/${chatId}`)

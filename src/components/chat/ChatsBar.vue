@@ -1,6 +1,7 @@
 <template>
   <div class="chat-bar">
     <div class="search-members">
+      <UserBar></UserBar>
       <SearchUserByNicknameInputVue
         :clear-members="clearMembers"
         :search-member-value="searchMemberValue"
@@ -47,9 +48,10 @@
 </template>
 
 <script setup lang="ts">
+import UserBar from 'components/bars/UserBar.vue'
 import SearchUserByNicknameInputVue from 'ui/inputs/SearchUserByNicknameInput.vue'
 import MemberItem from './MemberItem.vue'
-import ChatError from '../errors/ChatError.vue'
+import ChatError from 'components/errors/ChatError.vue'
 
 import { useChatStore } from '@/store/chatStore'
 import { onMounted, ref } from 'vue'
@@ -78,8 +80,17 @@ function handleInput(e: Event) {
 }
 
 function setMember(member: User) {
+  
   chatStore.setShowChat(true)
   emit('set-current-member', member)
+  const hasChat = chatStore.chatState.chats.find((chat) => chat.member.id === member.id)
+
+  if (hasChat) {
+    router.push({ query: { chatId: hasChat.id } })
+  } else {
+    router.push({ name: 'chats' })
+    chatStore.clearChat()
+  }
   clearMembers()
 }
 
@@ -106,7 +117,7 @@ function clearMembers() {
   grid-area: chat-bar;
   .search-members {
     background-color: rgb(73, 10, 144);
-    padding: 30px 10px 20px;
+    padding: 30px 20px 20px;
     border-bottom: 1px solid rgb(76, 76, 76);
     position: relative;
   }

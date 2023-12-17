@@ -1,7 +1,16 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import type { Chat, InitialValuesChatStore, SendMessageResponse } from './types/chatStoreTypes'
-import { fetchChatsRequest, searchMembersByNickname, sendMessageRequest } from '@/api/requests'
+import type {
+  Chat,
+  InitialValuesChatStore,
+  Message,
+  SendMessageResponse
+} from './types/chatStoreTypes'
+import {
+  fetchChatsRequest,
+  fetchMessagesRequest,
+  searchMembersByNickname,
+} from '@/api/requests'
 import type { User } from './types/userStoreTypes'
 
 export const useChatStore = defineStore('chat', () => {
@@ -37,7 +46,6 @@ export const useChatStore = defineStore('chat', () => {
 
   async function fetchChats() {
     const { data }: { data: Chat[] } = await fetchChatsRequest()
-    console.log(data)
 
     chatState.value.chats = data
   }
@@ -65,6 +73,19 @@ export const useChatStore = defineStore('chat', () => {
     }
   }
 
+  async function fetchMessages(chatId: string) {
+    try {
+      const { data }: { data: Message[] } = await fetchMessagesRequest(chatId)
+      if (!data) {
+        throw new Error()
+      }
+
+      chatState.value.messages = data
+    } catch (e) {
+      console.error(e)
+    }
+  }
+
   function setShowChat(isShow: boolean) {
     chatState.value.isShowChat = isShow
   }
@@ -72,11 +93,18 @@ export const useChatStore = defineStore('chat', () => {
   function setShowRecommendationMember(isShow: boolean) {
     chatState.value.isRecommendationMembers = isShow
   }
+
+  function clearChat(){
+    chatState.value.messages = []
+  }
+
   return {
     chatState,
+    clearChat,
+    fetchChats,
     setShowChat,
     sendMessage,
-    fetchChats,
+    fetchMessages,
     searchMembersByEmail,
     setShowRecommendationMember,
     setRecommendationMembers
