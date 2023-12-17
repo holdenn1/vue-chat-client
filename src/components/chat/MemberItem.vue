@@ -1,18 +1,14 @@
 <template>
   <div class="recommendation-members">
-    <img class="member-avatar" :src="userAvatar" alt="" />
-    <span class="member-name">{{ memberNickname }}</span>
+    <img class="member-avatar" :src="member.photo" alt="" />
+    <span class="member-name">{{ member.nickname }}</span>
   </div>
 </template>
 
 <script setup lang="ts">
-import userPreviewAvatar from '@/icons/icons8-user-48.png'
-import { computed } from 'vue'
-const props = defineProps<{ memberAvatar: string; memberNickname: string }>()
+import type { User } from '@/store/types/userStoreTypes'
 
-const userAvatar = computed(() => {
-  return !props.memberAvatar?.length || !props.memberAvatar ? userPreviewAvatar : props.memberAvatar
-})
+defineProps<{ member: User }>()
 </script>
 
 <style lang="scss" scoped>

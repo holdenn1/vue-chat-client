@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import type { InitialValuesChatStore } from './types/chatStoreTypes'
-import { searchMembersByNickname, sendMessageRequest } from '@/api/requests'
+import type { Chat, InitialValuesChatStore, SendMessageResponse } from './types/chatStoreTypes'
+import { fetchChatsRequest, searchMembersByNickname, sendMessageRequest } from '@/api/requests'
 import type { User } from './types/userStoreTypes'
 
 export const useChatStore = defineStore('chat', () => {
@@ -9,7 +9,8 @@ export const useChatStore = defineStore('chat', () => {
     isShowChat: false,
     messages: [],
     recommendationMembers: [],
-    isRecommendationMembers: false
+    isRecommendationMembers: false,
+    chats: []
   })
 
   const debounceTimeoutRef = ref<number | null>(null)
@@ -34,13 +35,34 @@ export const useChatStore = defineStore('chat', () => {
     }
   }
 
+  async function fetchChats() {
+    const { data }: { data: Chat[] } = await fetchChatsRequest()
+    console.log(data)
+
+    chatState.value.chats = data
+  }
+
   function setRecommendationMembers(members: User[]) {
     chatState.value.recommendationMembers = members
   }
 
-  async function sendMessage(recipientId: number, message: string) {
-    const data = await sendMessageRequest({ recipientId, message })
-    console.log(data)
+  async function sendMessage(recipient: User | undefined, data: SendMessageResponse) {
+    try {
+      if (!data) {
+        throw new Error()
+      }
+
+      if (data?.chat?.members && recipient) {
+        const checkRecipient = data.chat.members.find((member) => member.id === recipient.id)
+        if (checkRecipient) {
+          chatState.value.chats.push({ id: data.chat.id, member: recipient })
+        }
+      }
+
+      chatState.value.messages.unshift(data.message)
+    } catch (e) {
+      console.error(e)
+    }
   }
 
   function setShowChat(isShow: boolean) {
@@ -54,6 +76,7 @@ export const useChatStore = defineStore('chat', () => {
     chatState,
     setShowChat,
     sendMessage,
+    fetchChats,
     searchMembersByEmail,
     setShowRecommendationMember,
     setRecommendationMembers

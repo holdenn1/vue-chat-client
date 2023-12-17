@@ -1,6 +1,8 @@
 <template>
   <div class="chat-content-wrapper">
-    <!-- <ChatError>Select a chat to start a conversation</ChatError> -->
+    <ChatError v-show="!chatStore.chatState.isShowChat"
+      >Select a chat to start a conversation</ChatError
+    >
     <div class="chat" v-if="chatStore.chatState.isShowChat">
       <div class="chat-header">
         <div class="member-wrapper">
@@ -9,17 +11,21 @@
         </div>
       </div>
       <div class="chat-content">
-        <div class="message-of-sender">
-          <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum, dolores.</p>
-          <span class="message-date">21:52</span>
-        </div>
-        <div class="message-of-recipient">
-          <p>Lorem ipsum dolor sit.</p>
-          <span class="message-date">21:53</span>
+        <div
+          v-for="message of chatStore.chatState.messages"
+          :key="message.id"
+          :class="[
+            message.senderId === userStore.userState.user?.id
+              ? 'message-of-sender'
+              : 'message-of-recipient'
+          ]"
+        >
+          <p>{{ message.message }}</p>
+          <span class="message-date"></span>
         </div>
       </div>
       <div class="chat-message-form-wrapper">
-        <ChatForm :recipient-id="currentMember?.id" />
+        <ChatForm :recipient="currentMember" />
       </div>
     </div>
   </div>
@@ -27,14 +33,16 @@
 
 <script setup lang="ts">
 import ChatForm from 'components/forms/ChatForm.vue'
-// import ChatError from '../errors/ChatError.vue'
+import ChatError from '../errors/ChatError.vue'
 
 import { useChatStore } from '@/store/chatStore'
 import type { User } from '@/store/types/userStoreTypes'
+import { useUserStore } from '@/store/userStore'
 
 defineProps<{ currentMember: User | undefined }>()
 
 const chatStore = useChatStore()
+const userStore = useUserStore()
 </script>
 
 <style lang="scss" scoped>
@@ -58,9 +66,8 @@ const chatStore = useChatStore()
         display: flex;
         align-items: center;
         .member-avatar {
-          width: 40px;
-          height: 40px;
-          background-color: green;
+          width: 48px;
+          height: 48px;
           border-radius: 100%;
           margin-right: 12px;
         }

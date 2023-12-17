@@ -8,12 +8,15 @@
 </template>
 
 <script setup lang="ts">
+import { sendMessageRequest } from '@/api/requests'
 import { useChatStore } from '@/store/chatStore'
+import type { SendMessageResponse } from '@/store/types/chatStoreTypes'
+import type { User } from '@/store/types/userStoreTypes'
 
 import { useForm } from 'vee-validate'
 import * as yup from 'yup'
 
-const props = defineProps<{ recipientId: number | undefined }>()
+const props = defineProps<{ recipient: User | undefined }>()
 
 const chatStore = useChatStore()
 
@@ -29,8 +32,13 @@ const [message, messageAtr] = defineField('message')
 const onSubmit = handleSubmit(async ({ message }, { resetForm }) => {
   if (!message.length) return
 
-  if (props.recipientId) {
-    chatStore.sendMessage(props.recipientId, message)
+  if (props.recipient) {
+    const { data }: { data: SendMessageResponse } = await sendMessageRequest({
+      recipientId: props.recipient.id,
+      message
+    })
+
+    chatStore.sendMessage(props.recipient, data)
   }
 
   resetForm()
@@ -56,8 +64,6 @@ const onSubmit = handleSubmit(async ({ message }, { resetForm }) => {
     &:focus {
       outline: none;
     }
-  }
-  .send-message-btn {
   }
 }
 </style>

@@ -12,20 +12,25 @@
       class="recommendation-members-wrapper"
       v-show="chatStore.chatState.isRecommendationMembers"
     >
-      <RecommendationMembers
+      <MemberItem
         v-for="member of chatStore.chatState.recommendationMembers"
         @click="() => setMember(member)"
         :key="member.id"
-        :member-nickname="member.nickname"
-        :member-avatar="member.photo"
+        :member="member"
       />
     </div>
     <div class="chats-list-wrapper">
+      <div v-show="!chatStore.chatState.isRecommendationMembers">
+        <MemberItem
+          v-for="chat of chatStore.chatState.chats"
+          @click="() => openChat(String(chat.id), chat.member)"
+          :key="chat.id"
+          :member="chat.member"
+        />
+      </div>
+
       <ChatError
-        v-show="
-          !chatStore.chatState.isRecommendationMembers &&
-          !chatStore.chatState.recommendationMembers.length
-        "
+        v-show="!chatStore.chatState.isRecommendationMembers && !chatStore.chatState.chats.length"
       >
         No chats Found
       </ChatError>
@@ -43,21 +48,27 @@
 
 <script setup lang="ts">
 import SearchUserByNicknameInputVue from 'ui/inputs/SearchUserByNicknameInput.vue'
-import RecommendationMembers from './RecommendationMembers.vue'
+import MemberItem from './MemberItem.vue'
 import ChatError from '../errors/ChatError.vue'
 
 import { useChatStore } from '@/store/chatStore'
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 
 import type { User } from '@/store/types/userStoreTypes'
+import { useRouter } from 'vue-router'
 
 const searchMemberValue = ref('')
+const router = useRouter()
 
 const emit = defineEmits<{
   (e: 'set-current-member', member: User): void
 }>()
 
 const chatStore = useChatStore()
+
+onMounted(() => {
+  chatStore.fetchChats()
+})
 
 function handleInput(e: Event) {
   const value = (e.target as HTMLInputElement).value.toLowerCase()
@@ -70,6 +81,12 @@ function setMember(member: User) {
   chatStore.setShowChat(true)
   emit('set-current-member', member)
   clearMembers()
+}
+
+function openChat(chatId: string, member: User) {
+  chatStore.setShowChat(true)
+  emit('set-current-member', member)
+  router.push({ query: { chatId } })
 }
 
 function clearMembers() {
