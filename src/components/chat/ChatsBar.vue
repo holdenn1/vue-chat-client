@@ -1,7 +1,7 @@
 <template>
   <div class="chat-bar">
     <div class="search-members">
-      <UserBar></UserBar>
+      <UserBar/>
       <SearchUserByNicknameInputVue
         :clear-members="clearMembers"
         :search-member-value="searchMemberValue"

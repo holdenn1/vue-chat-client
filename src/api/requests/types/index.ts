@@ -13,3 +13,7 @@ export type SendMessageData = {
   recipientId: number;
   message: string;
 }
+
+export type UpdateUserData = {
+  nickname?: string
+}

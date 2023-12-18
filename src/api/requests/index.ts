@@ -1,6 +1,6 @@
 import instance from '@/api'
 import axios from 'axios'
-import type { LoginUserData, RegistrationUserData, SendMessageData } from './types'
+import type { LoginUserData, RegistrationUserData, SendMessageData, UpdateUserData } from './types'
 
 export const BASE_URL = 'http://localhost:8000/'
 
@@ -15,15 +15,29 @@ export const refreshRequest = () => axios.create({ baseURL: BASE_URL }).get('aut
 
 export const refreshTokensLogin = () => instance.get('auth/token/refresh/refresh-login')
 
-export const getUserByIdRequest = (userId:string) => instance.get(`user/user/${userId}`)
+export const getUserByIdRequest = (userId: string) => instance.get(`user/user/${userId}`)
 
+export const updateUserAvatar = (cover: File) => {
+  const formData = new FormData()
+
+  formData.append('cover', cover)
+
+  return instance.post('user/update-user-avatar', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    }
+  })
+}
+
+export const updateUserRequest = (data: UpdateUserData) => instance.put('user/update-user', data)
 //
 
 export const searchMembersByNickname = (nickname: string) =>
   instance.get(`user/search-users?nickname=${nickname}`)
 
-export const sendMessageRequest = (data: SendMessageData) => instance.post(`chat/send-message`, data)
+export const sendMessageRequest = (data: SendMessageData) =>
+  instance.post(`chat/send-message`, data)
 
 export const fetchChatsRequest = () => instance.get('chat/get-chats')
 
-export const fetchMessagesRequest = (chatId:string) => instance.get(`chat/get-messages/${chatId}`)
+export const fetchMessagesRequest = (chatId: string) => instance.get(`chat/get-messages/${chatId}`)

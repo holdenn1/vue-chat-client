@@ -5,6 +5,7 @@
     >
     <div class="chat" v-if="chatStore.chatState.isShowChat">
       <div class="chat-header">
+        <img class="arrow-back" @click="closeChat" src="@/icons/icons8-left-arrow-48.png" alt="" />
         <div class="member-wrapper">
           <img class="member-avatar" :src="currentMember?.photo" alt="" />
           <span class="member-name">{{ currentMember?.nickname }}</span>
@@ -37,7 +38,7 @@ import ChatError from '../errors/ChatError.vue'
 
 import { useChatStore } from '@/store/chatStore'
 import { useUserStore } from '@/store/userStore'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { watch } from 'vue'
 import type { User } from '@/store/types/userStoreTypes'
 
@@ -47,12 +48,18 @@ const chatStore = useChatStore()
 const userStore = useUserStore()
 
 const route = useRoute()
+const router = useRouter()
+
+function closeChat() {
+  chatStore.setShowChat(false)
+  chatStore.clearChat()
+  router.push({ name: 'chats' })
+}
 
 watch(
   () => route.query,
   async () => {
     if (route.query.chatId) {
-
       chatStore.fetchMessages(route.query.chatId as string)
     }
   }
@@ -76,7 +83,16 @@ watch(
       height: 88.5px;
       background-color: rgb(73, 10, 144);
       flex-shrink: 0;
+      position: relative;
       @include flexCenter;
+
+      .arrow-back {
+        position: absolute;
+        top: 50%;
+        left: 20px;
+        transform: translate(0, -50%);
+        cursor: pointer;
+      }
       .member-wrapper {
         display: flex;
         align-items: center;
@@ -121,7 +137,7 @@ watch(
         position: relative;
         font-weight: 500;
         line-height: 120%;
-        
+
         .message-date {
           position: absolute;
           bottom: 4px;
@@ -135,6 +151,7 @@ watch(
       height: 120px;
       background-color: rgb(73, 10, 144);
       padding: 20px;
+      flex-shrink: 0;
     }
   }
 }
