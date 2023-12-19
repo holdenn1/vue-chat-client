@@ -1,6 +1,6 @@
 <template>
   <form @submit="onSubmit" class="chat-message-form">
-    <textarea v-model="message" v-bind="messageAtr" class="chat-input" />
+    <textarea v-model="message" v-bind="messageAtr" placeholder="Write a message" class="chat-input" />
     <button type="submit" class="send-message-btn" :disabled="isSubmitting">
       <img src="@/icons/icons8-send-30.png" alt="sent" />
     </button>

@@ -3,7 +3,7 @@
     <ChatError v-show="!chatStore.chatState.isShowChat"
       >Select a chat to start a conversation</ChatError
     >
-    <div class="chat" v-if="chatStore.chatState.isShowChat">
+    <div class="chat" v-show="chatStore.chatState.isShowChat">
       <div class="chat-header">
         <img class="arrow-back" @click="closeChat" src="@/icons/icons8-left-arrow-48.png" alt="" />
         <div class="member-wrapper">
@@ -24,6 +24,7 @@
           <p>{{ message.message }}</p>
           <span class="message-date">22:00</span>
         </div>
+        <div ref="div"></div>
       </div>
       <div class="chat-message-form-wrapper">
         <ChatForm :recipient="currentMember" />
@@ -39,7 +40,7 @@ import ChatError from '../errors/ChatError.vue'
 import { useChatStore } from '@/store/chatStore'
 import { useUserStore } from '@/store/userStore'
 import { useRoute, useRouter } from 'vue-router'
-import { watch } from 'vue'
+import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import type { User } from '@/store/types/userStoreTypes'
 
 defineProps<{ currentMember: User | undefined }>()
@@ -50,16 +51,39 @@ const userStore = useUserStore()
 const route = useRoute()
 const router = useRouter()
 
+const loading = ref(false)
+const div = ref()
+
 function closeChat() {
   chatStore.setShowChat(false)
   chatStore.clearChat()
   router.push({ name: 'chats' })
 }
 
+const observer = new IntersectionObserver(async ([entry]) => {
+  if (entry.isIntersecting && !loading.value) {
+    loading.value = true
+
+    if (route.query.chatId) {
+      chatStore.fetchMessages(route.query.chatId as string)
+    }
+
+    loading.value = false
+  }
+})
+
+onMounted(() => {
+  observer.observe(div.value)
+})
+
+onBeforeUnmount(() => observer.disconnect())
+
 watch(
   () => route.query,
   async () => {
     if (route.query.chatId) {
+      chatStore.setCurrentMessagesPage(1)
+      chatStore.clearChat()
       chatStore.fetchMessages(route.query.chatId as string)
     }
   }

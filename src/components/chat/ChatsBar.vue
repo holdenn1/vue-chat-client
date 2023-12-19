@@ -1,7 +1,7 @@
 <template>
   <div class="chat-bar">
     <div class="search-members">
-      <UserBar/>
+      <UserBar />
       <SearchUserByNicknameInputVue
         :clear-members="clearMembers"
         :search-member-value="searchMemberValue"
@@ -21,15 +21,15 @@
       />
     </div>
     <div class="chats-list-wrapper">
-      <div v-show="!chatStore.chatState.isRecommendationMembers">
+      <template v-if="!chatStore.chatState.isRecommendationMembers">
         <MemberItem
           v-for="chat of chatStore.chatState.chats"
           @click="() => openChat(String(chat.id), chat.member)"
           :key="chat.id"
           :member="chat.member"
         />
-      </div>
-
+        <div ref="div"></div>
+      </template>
       <ChatError
         v-show="!chatStore.chatState.isRecommendationMembers && !chatStore.chatState.chats.length"
       >
@@ -54,12 +54,15 @@ import MemberItem from './MemberItem.vue'
 import ChatError from 'components/errors/ChatError.vue'
 
 import { useChatStore } from '@/store/chatStore'
-import { onMounted, ref } from 'vue'
+import { onBeforeUnmount, onMounted, ref } from 'vue'
 
 import type { User } from '@/store/types/userStoreTypes'
 import { useRouter } from 'vue-router'
 
 const searchMemberValue = ref('')
+const loading = ref(false)
+const div = ref()
+
 const router = useRouter()
 
 const emit = defineEmits<{
@@ -68,9 +71,21 @@ const emit = defineEmits<{
 
 const chatStore = useChatStore()
 
-onMounted(() => {
-  chatStore.fetchChats()
+const observer = new IntersectionObserver(async ([entry]) => {
+  if (entry.isIntersecting && !loading.value) {
+    loading.value = true
+
+    chatStore.fetchChats()
+
+    loading.value = false
+  }
 })
+
+onMounted(() => {
+  observer.observe(div.value)
+})
+
+onBeforeUnmount(() => observer.disconnect())
 
 function handleInput(e: Event) {
   const value = (e.target as HTMLInputElement).value.toLowerCase()
@@ -80,7 +95,6 @@ function handleInput(e: Event) {
 }
 
 function setMember(member: User) {
-  
   chatStore.setShowChat(true)
   emit('set-current-member', member)
   const hasChat = chatStore.chatState.chats.find((chat) => chat.member.id === member.id)
@@ -108,6 +122,7 @@ function clearMembers() {
 </script>
 
 <style lang="scss" scoped>
+@import '@/styles/mixins/scrollbar.scss';
 .chat-bar {
   max-width: 320px;
   width: 100%;
@@ -116,6 +131,7 @@ function clearMembers() {
   position: relative;
   grid-area: chat-bar;
   .search-members {
+    height: 168.5px;
     background-color: rgb(73, 10, 144);
     padding: 30px 20px 20px;
     border-bottom: 1px solid rgb(76, 76, 76);
@@ -124,7 +140,12 @@ function clearMembers() {
 
   .chats-list-wrapper {
     width: 100%;
-    height: calc(100% - 20%);
+    height: calc(100% - 168.5px);
+    overflow-x: hidden;
+    overflow-y: auto;
+    @include scrollbar(black, 2px);
+    padding-bottom: 10px;
+  
   }
 }
 </style>

@@ -16,6 +16,8 @@ export type InitialValuesChatStore = {
   recommendationMembers: User[]
   isRecommendationMembers: boolean
   chats: Chat[]
+  currentMessagesPage: number
+  currentChatsPage: number
 }
 
 export type SendMessageResponse = {

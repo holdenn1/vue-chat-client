@@ -6,11 +6,7 @@ import type {
   Message,
   SendMessageResponse
 } from './types/chatStoreTypes'
-import {
-  fetchChatsRequest,
-  fetchMessagesRequest,
-  searchMembersByNickname,
-} from '@/api/requests'
+import { fetchChatsRequest, fetchMessagesRequest, searchMembersByNickname } from '@/api/requests'
 import type { User } from './types/userStoreTypes'
 
 export const useChatStore = defineStore('chat', () => {
@@ -19,7 +15,9 @@ export const useChatStore = defineStore('chat', () => {
     messages: [],
     recommendationMembers: [],
     isRecommendationMembers: false,
-    chats: []
+    chats: [],
+    currentChatsPage: 1,
+    currentMessagesPage: 1
   })
 
   const debounceTimeoutRef = ref<number | null>(null)
@@ -45,9 +43,20 @@ export const useChatStore = defineStore('chat', () => {
   }
 
   async function fetchChats() {
-    const { data }: { data: Chat[] } = await fetchChatsRequest()
+    console.log(chatState.value.currentChatsPage)
 
-    chatState.value.chats = data
+    const { data }: { data: Chat[] } = await fetchChatsRequest(
+      String(chatState.value.currentChatsPage)
+    )
+    console.log(data)
+
+    if (data.length) {
+      const oldChats = chatState.value.chats.map((chat) => chat.id)
+      const newChats = data.filter((chat) => !oldChats.includes(chat.id))
+
+      chatState.value.chats = [...chatState.value.chats, ...newChats]
+      chatState.value.currentChatsPage += 1
+    }
   }
 
   function setRecommendationMembers(members: User[]) {
@@ -75,17 +84,27 @@ export const useChatStore = defineStore('chat', () => {
 
   async function fetchMessages(chatId: string) {
     try {
-      const { data }: { data: Message[] } = await fetchMessagesRequest(chatId)
-      if (!data) {
-        throw new Error()
-      }
+      console.log(chatState.value.currentMessagesPage)
 
-      chatState.value.messages = data
+      const { data }: { data: Message[] } = await fetchMessagesRequest(
+        chatId,
+        String(chatState.value.currentMessagesPage)
+      )
+      if (data.length) {
+        const oldMessages = chatState.value.messages.map((message) => message.id)
+        const newMessages = data.filter((message) => !oldMessages.includes(message.id))
+
+        chatState.value.messages = [...chatState.value.messages, ...newMessages]
+        chatState.value.currentMessagesPage += 1
+      }
     } catch (e) {
       console.error(e)
     }
   }
 
+  function setCurrentMessagesPage(page: number) {
+    chatState.value.currentMessagesPage = page
+  }
   function setShowChat(isShow: boolean) {
     chatState.value.isShowChat = isShow
   }
@@ -94,7 +113,7 @@ export const useChatStore = defineStore('chat', () => {
     chatState.value.isRecommendationMembers = isShow
   }
 
-  function clearChat(){
+  function clearChat() {
     chatState.value.messages = []
   }
 
@@ -106,6 +125,7 @@ export const useChatStore = defineStore('chat', () => {
     sendMessage,
     fetchMessages,
     searchMembersByEmail,
+    setCurrentMessagesPage,
     setShowRecommendationMember,
     setRecommendationMembers
   }

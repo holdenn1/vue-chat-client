@@ -38,6 +38,8 @@ export const searchMembersByNickname = (nickname: string) =>
 export const sendMessageRequest = (data: SendMessageData) =>
   instance.post(`chat/send-message`, data)
 
-export const fetchChatsRequest = () => instance.get('chat/get-chats')
+export const fetchChatsRequest = (currentPage: string) =>
+  instance.get(`chat/get-chats?&page=${currentPage}&pageSize=25`)
 
-export const fetchMessagesRequest = (chatId: string) => instance.get(`chat/get-messages/${chatId}`)
+export const fetchMessagesRequest = (chatId: string, currentPage: string) =>
+  instance.get(`chat/get-messages/${chatId}?&page=${currentPage}&pageSize=10`)

@@ -3,20 +3,25 @@
     <input class="upload-photo-input" type="file" @change="handleFileInputChange" />
     <img :src="userStore.userState.user?.photo" alt="" class="user-avatar" />
     <h4 class="user-name">
-      <span ref="editName" class="user-name__text" contentEditable="true">{{
-        userStore.userState.user?.nickname
-      }}</span>
-      <img class="edit-icon" src="@/icons/icons8-edit.svg" alt="" />
+      <span
+        :title="userStore.userState.user?.nickname"
+        ref="editName"
+        class="user-name__text"
+        contentEditable="true"
+        >{{ userStore.userState.user?.nickname }}</span
+      >
+      <img class="edit-icon" @click="() => editName.focus()" src="@/icons/icons8-edit.svg" alt="" />
     </h4>
   </div>
 </template>
 
 <script setup lang="ts">
 import { updateUserAvatar, updateUserRequest } from '@/api/requests'
-import type { User } from '@/store/types/userStoreTypes'
 import { useUserStore } from '@/store/userStore'
 import { onBeforeUnmount, onMounted, ref } from 'vue'
 import { useToastify } from 'vue-toastify-3'
+
+import type { User } from '@/store/types/userStoreTypes'
 
 const userStore = useUserStore()
 
@@ -49,15 +54,14 @@ const handleInput = () => {
 
 const updateNickname = async () => {
   try {
-    const trimNickname = updatedNickname.value.trim()
+    const trimNickname = editName.value.innerText.trim()
+    console.log(trimNickname.length)
 
-    console.log(trimNickname.length);
-    
     if (trimNickname.length < 3) {
       toastify('warning', 'Nickname must be longer than 3 characters')
       return
     }
-    const { data }: { data: User } = await updateUserRequest({ nickname: updatedNickname.value })
+    const { data }: { data: User } = await updateUserRequest({ nickname: trimNickname })
     if (!data) {
       throw new Error()
     }
@@ -109,27 +113,19 @@ onBeforeUnmount(() => {
       color: white;
       font-weight: 500;
       max-width: 140px;
+      min-width: 30px;
       height: 20px;
       white-space: nowrap;
       overflow: hidden;
-      text-overflow: ellipsis;
     }
 
     .edit-icon {
-      width: 24px;
-      height: 24px;
+      width: 22px;
+      height: 22px;
       position: absolute;
       right: -30px;
       top: 0px;
-      display: none;
-    }
-
-    .edit-icon {
-      display: none;
-    }
-
-    .user-name__text:hover + .edit-icon {
-      display: block;
+      cursor: pointer;
     }
   }
 }
