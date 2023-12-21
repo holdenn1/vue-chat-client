@@ -1,15 +1,23 @@
 <template>
   <div class="recommendation-members">
-    <img class="member-avatar" :src="member.photo" alt="" />
-    <span class="member-name">{{ member.nickname }}</span>
+    <img class="member-avatar" :src="chat.member.photo" alt="" />
+    <img
+      class="member-menu"
+      @click.stop="() => chatStore.removeChat(chat)"
+      src="@/icons/icons8-remove.svg"
+      alt=""
+    />
+    <span class="member-name">{{ chat.member.nickname }}</span>
   </div>
 </template>
 
 <script setup lang="ts">
-import type { User } from '@/store/types/userStoreTypes'
+import { useChatStore } from '@/store/chatStore'
+import type { Chat } from '@/store/types/chatStoreTypes'
 
-defineProps<{ member: User }>()
+defineProps<{ chat: Chat }>()
 
+const chatStore = useChatStore()
 </script>
 
 <style lang="scss" scoped>
@@ -33,12 +41,12 @@ defineProps<{ member: User }>()
     object-fit: cover;
     margin-right: 12px;
   }
-  .member-menu{
+  .member-menu {
     height: 20px;
     position: absolute;
     top: 50%;
     right: 10px;
-    transform: translate(0,-50%);
+    transform: translate(0, -50%);
     cursor: pointer;
   }
 }

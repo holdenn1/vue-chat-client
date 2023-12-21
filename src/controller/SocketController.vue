@@ -33,6 +33,8 @@ const handleSendMessage = async (sendMessageData: SendMessageSocket) => {
 
   if ((window as any)?.socket?.id === sendMessageData.socketId) return
 
+  console.log(sendMessageData);
+  
   if (sendMessageData.payload && userStore.userState.user) {
 
     if (sendMessageData.payload.chat?.members) {

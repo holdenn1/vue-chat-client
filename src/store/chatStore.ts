@@ -4,10 +4,17 @@ import type {
   Chat,
   InitialValuesChatStore,
   Message,
+  RemoveChatData,
   SendMessageResponse
 } from './types/chatStoreTypes'
-import { fetchChatsRequest, fetchMessagesRequest, searchMembersByNickname } from '@/api/requests'
+import {
+  fetchChatsRequest,
+  fetchMessagesRequest,
+  removeChatRequest,
+  searchMembersByNickname
+} from '@/api/requests'
 import type { User } from './types/userStoreTypes'
+import { useRouter } from 'vue-router'
 
 export const useChatStore = defineStore('chat', () => {
   const chatState = ref<InitialValuesChatStore>({
@@ -21,6 +28,8 @@ export const useChatStore = defineStore('chat', () => {
   })
 
   const debounceTimeoutRef = ref<number | null>(null)
+
+  const router = useRouter()
 
   function searchMembersByEmail(value: string) {
     try {
@@ -43,12 +52,9 @@ export const useChatStore = defineStore('chat', () => {
   }
 
   async function fetchChats() {
-    console.log(chatState.value.currentChatsPage)
-
     const { data }: { data: Chat[] } = await fetchChatsRequest(
       String(chatState.value.currentChatsPage)
     )
-    console.log(data)
 
     if (data.length) {
       const oldChats = chatState.value.chats.map((chat) => chat.id)
@@ -72,7 +78,7 @@ export const useChatStore = defineStore('chat', () => {
       if (data?.chat?.members && recipient) {
         const checkRecipient = data.chat.members.find((member) => member.id === recipient.id)
         if (checkRecipient) {
-          chatState.value.chats.push({ id: data.chat.id, member: recipient })
+          chatState.value.chats.unshift({ id: data.chat.id, member: recipient })
         }
       }
 
@@ -84,8 +90,6 @@ export const useChatStore = defineStore('chat', () => {
 
   async function fetchMessages(chatId: string) {
     try {
-      console.log(chatState.value.currentMessagesPage)
-
       const { data }: { data: Message[] } = await fetchMessagesRequest(
         chatId,
         String(chatState.value.currentMessagesPage)
@@ -97,6 +101,21 @@ export const useChatStore = defineStore('chat', () => {
         chatState.value.messages = [...chatState.value.messages, ...newMessages]
         chatState.value.currentMessagesPage += 1
       }
+    } catch (e) {
+      console.error(e)
+    }
+  }
+
+  async function removeChat(chat: Chat) {
+    try {
+      const { data }: RemoveChatData = await removeChatRequest(String(chat.member.id))
+
+      if (!data) {
+        throw new Error()
+      }
+      chatState.value.chats = chatState.value.chats.filter((chat) => chat.id !== data.chatId)
+      setShowChat(false)
+      router.replace({ name: 'chats' })
     } catch (e) {
       console.error(e)
     }
@@ -120,6 +139,7 @@ export const useChatStore = defineStore('chat', () => {
   return {
     chatState,
     clearChat,
+    removeChat,
     fetchChats,
     setShowChat,
     sendMessage,

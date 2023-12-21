@@ -22,11 +22,11 @@
     </div>
     <div class="chats-list-wrapper">
       <template v-if="!chatStore.chatState.isRecommendationMembers">
-        <MemberItem
+        <ChatItem
           v-for="chat of chatStore.chatState.chats"
           @click="() => openChat(String(chat.id), chat.member)"
           :key="chat.id"
-          :member="chat.member"
+          :chat="chat"
         />
         <div ref="div"></div>
       </template>
@@ -58,6 +58,7 @@ import { onBeforeUnmount, onMounted, ref } from 'vue'
 
 import type { User } from '@/store/types/userStoreTypes'
 import { useRouter } from 'vue-router'
+import ChatItem from './ChatItem.vue'
 
 const searchMemberValue = ref('')
 const loading = ref(false)
@@ -145,7 +146,6 @@ function clearMembers() {
     overflow-y: auto;
     @include scrollbar(black, 2px);
     padding-bottom: 10px;
-  
   }
 }
 </style>

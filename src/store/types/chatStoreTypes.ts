@@ -32,3 +32,10 @@ export type Chat = {
   id: number
   member: User
 }
+
+
+export type RemoveChatData = {
+  data: {
+    chatId: number
+  }
+}

@@ -55,7 +55,6 @@ const handleInput = () => {
 const updateNickname = async () => {
   try {
     const trimNickname = editName.value.innerText.trim()
-    console.log(trimNickname.length)
 
     if (trimNickname.length < 3) {
       toastify('warning', 'Nickname must be longer than 3 characters')

@@ -43,3 +43,6 @@ export const fetchChatsRequest = (currentPage: string) =>
 
 export const fetchMessagesRequest = (chatId: string, currentPage: string) =>
   instance.get(`chat/get-messages/${chatId}?&page=${currentPage}&pageSize=10`)
+
+export const removeChatRequest = (recipientId: string) =>
+  instance.delete(`chat/remove-chat/${recipientId}`)

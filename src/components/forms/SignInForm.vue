@@ -45,7 +45,6 @@ const { values, handleSubmit, isSubmitting } = useForm<InitialValuesSignInForm>(
 })
 
 const onSubmit = handleSubmit(async (values, { resetForm }) => {
-  console.log(values);
   await userStore.loginUser({ data: values })
   resetForm()
 })

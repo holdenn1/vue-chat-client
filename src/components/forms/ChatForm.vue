@@ -37,7 +37,8 @@ const onSubmit = handleSubmit(async ({ message }, { resetForm }) => {
       recipientId: props.recipient.id,
       message
     })
-
+console.log(data);
+    
     chatStore.sendMessage(props.recipient, data)
   }
 
