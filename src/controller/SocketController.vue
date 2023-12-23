@@ -8,10 +8,10 @@ import { Manager } from 'socket.io-client'
 import { BASE_URL } from '@/api'
 import { getUserByIdRequest } from '@/api/requests'
 import { NotificationType } from './types'
-import type { SendMessageSocket } from './types'
 import { useChatStore } from '@/store/chatStore'
 import { useUserStore } from '@/store/userStore'
 import type { User } from '@/store/types/userStoreTypes'
+import type { SendMessageSocket, RemoveChatSocket } from './types'
 
 const chatStore = useChatStore()
 const userStore = useUserStore()
@@ -24,19 +24,18 @@ onMounted(() => {
   ;(window as any).socket = socket
 
   socket.on(NotificationType.SEND_MESSAGE, handleSendMessage)
+  socket.on(NotificationType.REMOVE_CHAT, handleRemoveChat)
   return () => {
     socket.disconnect()
   }
 })
 
 const handleSendMessage = async (sendMessageData: SendMessageSocket) => {
-
   if ((window as any)?.socket?.id === sendMessageData.socketId) return
 
   console.log(sendMessageData);
   
   if (sendMessageData.payload && userStore.userState.user) {
-
     if (sendMessageData.payload.chat?.members) {
       const recipientId = sendMessageData.payload.chat?.members.find(
         (user) => user.id !== userStore.userState.user?.id
@@ -51,7 +50,12 @@ const handleSendMessage = async (sendMessageData: SendMessageSocket) => {
 
     chatStore.sendMessage(undefined, sendMessageData.payload)
   }
+}
 
+const handleRemoveChat = async (removeChatData: RemoveChatSocket) => {
+  if ((window as any)?.socket?.id === removeChatData.socketId) return
+
+  chatStore.removeChat(removeChatData.payload.chatId)
 }
 </script>
 

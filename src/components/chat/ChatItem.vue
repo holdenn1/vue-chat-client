@@ -3,7 +3,7 @@
     <img class="member-avatar" :src="chat.member.photo" alt="" />
     <img
       class="member-menu"
-      @click.stop="() => chatStore.removeChat(chat)"
+      @click.stop="() => chatStore.removeChatAction(chat)"
       src="@/icons/icons8-remove.svg"
       alt=""
     />

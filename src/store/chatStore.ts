@@ -78,10 +78,22 @@ export const useChatStore = defineStore('chat', () => {
       if (data?.chat?.members && recipient) {
         const checkRecipient = data.chat.members.find((member) => member.id === recipient.id)
         if (checkRecipient) {
-          chatState.value.chats.unshift({ id: data.chat.id, member: recipient })
+          chatState.value.chats.unshift({
+            id: data.chat.id,
+            member: recipient
+          })
         }
       }
 
+      console.log(data);
+      
+      const chatToUpdate = chatState.value.chats.find((chat) => chat.id === data.message.chatId)
+      if (chatToUpdate) {
+        chatState.value.chats = [
+          chatToUpdate,
+          ...chatState.value.chats.filter((chat) => chat.id !== data.message.chatId)
+        ]
+      }
       chatState.value.messages.unshift(data.message)
     } catch (e) {
       console.error(e)
@@ -106,19 +118,25 @@ export const useChatStore = defineStore('chat', () => {
     }
   }
 
-  async function removeChat(chat: Chat) {
+  async function removeChatAction(chat: Chat) {
     try {
       const { data }: RemoveChatData = await removeChatRequest(String(chat.member.id))
 
       if (!data) {
         throw new Error()
       }
-      chatState.value.chats = chatState.value.chats.filter((chat) => chat.id !== data.chatId)
-      setShowChat(false)
-      router.replace({ name: 'chats' })
+      removeChat(data.chatId)
     } catch (e) {
       console.error(e)
     }
+  }
+
+  function removeChat(chatId: number) {
+    chatState.value.messages = []
+    chatState.value.chats = chatState.value.chats.filter((chat) => chat.id !== chatId)
+
+    setShowChat(false)
+    router.replace({ name: 'chats' })
   }
 
   function setCurrentMessagesPage(page: number) {
@@ -144,6 +162,7 @@ export const useChatStore = defineStore('chat', () => {
     setShowChat,
     sendMessage,
     fetchMessages,
+    removeChatAction,
     searchMembersByEmail,
     setCurrentMessagesPage,
     setShowRecommendationMember,
