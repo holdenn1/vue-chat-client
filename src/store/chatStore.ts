@@ -14,7 +14,7 @@ import {
   searchMembersByNickname
 } from '@/api/requests'
 import type { User } from './types/userStoreTypes'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 
 export const useChatStore = defineStore('chat', () => {
   const chatState = ref<InitialValuesChatStore>({
@@ -30,6 +30,7 @@ export const useChatStore = defineStore('chat', () => {
   const debounceTimeoutRef = ref<number | null>(null)
 
   const router = useRouter()
+  const route = useRoute()
 
   function searchMembersByEmail(value: string) {
     try {
@@ -69,24 +70,25 @@ export const useChatStore = defineStore('chat', () => {
     chatState.value.recommendationMembers = members
   }
 
-  async function sendMessage(recipient: User | undefined, data: SendMessageResponse) {
+  async function sendMessage(data: SendMessageResponse) {
     try {
       if (!data) {
         throw new Error()
       }
 
-      if (data?.chat?.members && recipient) {
-        const checkRecipient = data.chat.members.find((member) => member.id === recipient.id)
-        if (checkRecipient) {
-          chatState.value.chats.unshift({
-            id: data.chat.id,
-            member: recipient
-          })
-        }
+      if (!route.query.chatId) {
+        router.push({ query: { chatId: data.chat?.id } })
       }
 
-      console.log(data);
-      
+      if (data.chat?.members && data.participant) {
+        chatState.value.chats.unshift({
+          id: data.chat.id,
+          member: data.participant,
+          createdDate: data.chat.createdDate,
+          updatedDate: data.chat.updatedDate
+        })
+      }
+
       const chatToUpdate = chatState.value.chats.find((chat) => chat.id === data.message.chatId)
       if (chatToUpdate) {
         chatState.value.chats = [
@@ -94,7 +96,10 @@ export const useChatStore = defineStore('chat', () => {
           ...chatState.value.chats.filter((chat) => chat.id !== data.message.chatId)
         ]
       }
-      chatState.value.messages.unshift(data.message)
+
+      if (+(route.query.chatId as string) === data.message.chatId) {
+        chatState.value.messages.unshift(data.message)
+      }
     } catch (e) {
       console.error(e)
     }

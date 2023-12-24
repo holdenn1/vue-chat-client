@@ -6,11 +6,9 @@
 import { onMounted } from 'vue'
 import { Manager } from 'socket.io-client'
 import { BASE_URL } from '@/api'
-import { getUserByIdRequest } from '@/api/requests'
 import { NotificationType } from './types'
 import { useChatStore } from '@/store/chatStore'
 import { useUserStore } from '@/store/userStore'
-import type { User } from '@/store/types/userStoreTypes'
 import type { SendMessageSocket, RemoveChatSocket } from './types'
 
 const chatStore = useChatStore()
@@ -33,22 +31,19 @@ onMounted(() => {
 const handleSendMessage = async (sendMessageData: SendMessageSocket) => {
   if ((window as any)?.socket?.id === sendMessageData.socketId) return
 
-  console.log(sendMessageData);
-  
+  console.log(sendMessageData)
+
   if (sendMessageData.payload && userStore.userState.user) {
     if (sendMessageData.payload.chat?.members) {
-      const recipientId = sendMessageData.payload.chat?.members.find(
-        (user) => user.id !== userStore.userState.user?.id
+      const sender = sendMessageData.payload.chat.members.find(
+        (member) => member.id === sendMessageData.payload.message.senderId
       )
-
-      if (recipientId) {
-        const { data: recipient }: { data: User } = await getUserByIdRequest(String(recipientId.id))
-        chatStore.sendMessage(recipient, sendMessageData.payload)
+      if (sender) {
+        chatStore.sendMessage({ ...sendMessageData.payload, participant: sender })
         return
       }
     }
-
-    chatStore.sendMessage(undefined, sendMessageData.payload)
+    chatStore.sendMessage(sendMessageData.payload)
   }
 }
 

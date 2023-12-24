@@ -12,18 +12,23 @@
         </div>
       </div>
       <div class="chat-content">
-        <div
-          v-for="message of chatStore.chatState.messages"
-          :key="message.id"
-          :class="[
-            message.senderId === userStore.userState.user?.id
-              ? 'message-of-sender'
-              : 'message-of-recipient'
-          ]"
-        >
-          <p>{{ message.message }}</p>
-          <span class="message-date">22:00</span>
-        </div>
+        <template v-for="(message, inx) of chatStore.chatState.messages" :key="message.id">
+          <div
+            :class="[
+              message.senderId === userStore.userState.user?.id
+                ? 'message-of-sender'
+                : 'message-of-recipient'
+            ]"
+          >
+            <p>{{ message.message }}</p>
+            <span class="message-date">{{ correctDate(message.createdDate) }}</span>
+          </div>
+          <div v-if="showDateBlock(inx)">
+            <div class="date-block">
+              {{ formatDate(message.createdDate) }}
+            </div>
+          </div>
+        </template>
         <div ref="div"></div>
       </div>
       <div class="chat-message-form-wrapper">
@@ -88,6 +93,31 @@ watch(
     }
   }
 )
+
+function correctDate(dateTimeString: Date) {
+  const dateTime = new Date(dateTimeString)
+  const hours = dateTime.getHours()
+  const minutes = dateTime.getMinutes()
+
+  return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`
+}
+
+function showDateBlock(index: number) {
+  if (index === chatStore.chatState.messages.length - 1) return true
+
+  const currentDate = new Date(chatStore.chatState.messages[index].createdDate)
+  const nextDate = new Date(chatStore.chatState.messages[index + 1].createdDate)
+
+  return currentDate.toDateString() !== nextDate.toDateString()
+}
+function formatDate(dateString: Date) {
+  const date = new Date(dateString)
+  return date.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  })
+}
 </script>
 
 <style lang="scss" scoped>
@@ -168,6 +198,10 @@ watch(
           right: 10px;
           font-size: 12px;
         }
+      }
+
+      .date-block{
+        text-align: center;
       }
     }
     .chat-message-form-wrapper {

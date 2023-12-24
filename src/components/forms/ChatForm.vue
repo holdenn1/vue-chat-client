@@ -1,6 +1,11 @@
 <template>
   <form @submit="onSubmit" class="chat-message-form">
-    <textarea v-model="message" v-bind="messageAtr" placeholder="Write a message" class="chat-input" />
+    <textarea
+      v-model="message"
+      v-bind="messageAtr"
+      placeholder="Write a message"
+      class="chat-input"
+    />
     <button type="submit" class="send-message-btn" :disabled="isSubmitting">
       <img src="@/icons/icons8-send-30.png" alt="sent" />
     </button>
@@ -37,11 +42,17 @@ const onSubmit = handleSubmit(async ({ message }, { resetForm }) => {
       recipientId: props.recipient.id,
       message
     })
-    
-    chatStore.sendMessage(props.recipient, data)
-  }
 
-  resetForm()
+    const recipient = data.chat?.members?.find((member) => member.id !== data.message.senderId)
+    if (recipient) {
+      chatStore.sendMessage({ ...data, participant: recipient })
+
+      resetForm()
+      return
+    }
+    chatStore.sendMessage(data)
+    resetForm()
+  }
 })
 </script>
 

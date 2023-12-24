@@ -23,14 +23,20 @@ export type InitialValuesChatStore = {
 export type SendMessageResponse = {
   chat?: {
     id: number
-    members?: { id: number }[]
+    members?: User[]
+    createdDate: Date
+    updatedDate: Date
   }
   message: Message
+  recipientId: number
+  participant?: User
 }
 
 export type Chat = {
   id: number
   member: User
+  createdDate: Date
+  updatedDate: Date
 }
 
 export type RemoveChatData = {
