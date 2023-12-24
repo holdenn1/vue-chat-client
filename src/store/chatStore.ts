@@ -76,7 +76,7 @@ export const useChatStore = defineStore('chat', () => {
         throw new Error()
       }
 
-      if (!route.query.chatId) {
+      if (route.query.previewChat) {
         router.push({ query: { chatId: data.chat?.id } })
       }
 

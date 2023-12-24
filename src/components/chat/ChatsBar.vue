@@ -56,9 +56,10 @@ import ChatError from 'components/errors/ChatError.vue'
 import { useChatStore } from '@/store/chatStore'
 import { onBeforeUnmount, onMounted, ref } from 'vue'
 
-import type { User } from '@/store/types/userStoreTypes'
 import { useRouter } from 'vue-router'
 import ChatItem from './ChatItem.vue'
+
+import type { User } from '@/store/types/userStoreTypes'
 
 const searchMemberValue = ref('')
 const loading = ref(false)
@@ -103,7 +104,7 @@ function setMember(member: User) {
   if (hasChat) {
     router.push({ query: { chatId: hasChat.id } })
   } else {
-    router.push({ name: 'chats' })
+    router.push({ name: 'chats', query: { previewChat: 'true' } })
     chatStore.clearChat()
   }
   clearMembers()

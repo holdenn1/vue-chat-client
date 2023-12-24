@@ -11,7 +11,17 @@
           <span class="member-name">{{ currentMember?.nickname }}</span>
         </div>
       </div>
-      <div class="chat-content">
+      <div ref="chatContainer" class="chat-content">
+        <Transition>
+          <div v-show="isArrowShow" class="arrow-down-wrapper">
+            <img
+              @click="scrollToElement"
+              class="arrow-down"
+              src="@/icons/icons8-arrow-down-48.png"
+              alt=""
+            />
+          </div>
+        </Transition>
         <template v-for="(message, inx) of chatStore.chatState.messages" :key="message.id">
           <div
             :class="[
@@ -45,7 +55,7 @@ import ChatError from '../errors/ChatError.vue'
 import { useChatStore } from '@/store/chatStore'
 import { useUserStore } from '@/store/userStore'
 import { useRoute, useRouter } from 'vue-router'
-import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import type { User } from '@/store/types/userStoreTypes'
 
 defineProps<{ currentMember: User | undefined }>()
@@ -58,6 +68,9 @@ const router = useRouter()
 
 const loading = ref(false)
 const div = ref()
+const chatContainer = ref()
+const isArrowShow = ref()
+const scrollTopTo = ref(0)
 
 function closeChat() {
   chatStore.setShowChat(false)
@@ -79,9 +92,12 @@ const observer = new IntersectionObserver(async ([entry]) => {
 
 onMounted(() => {
   observer.observe(div.value)
+  chatContainer.value.addEventListener('scroll', handleScroll)
 })
 
-onBeforeUnmount(() => observer.disconnect())
+onBeforeUnmount(
+  () => (observer.disconnect(), chatContainer.value.removeEventListener('scroll', handleScroll))
+)
 
 watch(
   () => route.query,
@@ -94,6 +110,14 @@ watch(
   }
 )
 
+watch(
+  () => chatStore.chatState.messages.length,
+  () => {
+    nextTick(() => {
+      scrollToElement()
+    })
+  }
+)
 function correctDate(dateTimeString: Date) {
   const dateTime = new Date(dateTimeString)
   const hours = dateTime.getHours()
@@ -110,6 +134,7 @@ function showDateBlock(index: number) {
 
   return currentDate.toDateString() !== nextDate.toDateString()
 }
+
 function formatDate(dateString: Date) {
   const date = new Date(dateString)
   return date.toLocaleDateString('en-US', {
@@ -117,6 +142,25 @@ function formatDate(dateString: Date) {
     month: 'long',
     day: 'numeric'
   })
+}
+
+function scrollToElement() {
+  chatContainer.value.scrollTo({
+    top: chatContainer.value.scrollHeight,
+
+    behavior: 'smooth'
+  })
+  isArrowShow.value = false
+}
+
+function handleScroll() {
+  scrollTopTo.value = chatContainer.value.scrollTop
+
+  if (scrollTopTo.value < -245) {
+    isArrowShow.value = true
+  } else {
+    isArrowShow.value = false
+  }
 }
 </script>
 
@@ -169,7 +213,33 @@ function formatDate(dateString: Date) {
       display: flex;
       flex-direction: column-reverse;
       padding: 10px;
+      position: relative;
       @include scrollbar(4px, black);
+      .arrow-down-wrapper {
+        position: absolute;
+        z-index: 1000;
+        bottom: 80px;
+        right: 56px;
+        .arrow-down {
+          position: fixed;
+          opacity: 0.7;
+          transition: 0.3s;
+          cursor: pointer;
+          &:hover {
+            opacity: 1;
+          }
+        }
+      }
+
+      .v-enter-active,
+      .v-leave-active {
+        transition: opacity 0.3s;
+      }
+
+      .v-enter-from,
+      .v-leave-to {
+        opacity: 0;
+      }
       .message-of-sender {
         background-color: #679ce3;
         margin-left: auto;
@@ -200,7 +270,7 @@ function formatDate(dateString: Date) {
         }
       }
 
-      .date-block{
+      .date-block {
         text-align: center;
       }
     }

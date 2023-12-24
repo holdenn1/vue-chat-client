@@ -21,7 +21,9 @@ import type { User } from '@/store/types/userStoreTypes'
 import { useForm } from 'vee-validate'
 import * as yup from 'yup'
 
-const props = defineProps<{ recipient: User | undefined }>()
+const props = defineProps<{
+  recipient: User | undefined
+}>()
 
 const chatStore = useChatStore()
 
@@ -46,7 +48,6 @@ const onSubmit = handleSubmit(async ({ message }, { resetForm }) => {
     const recipient = data.chat?.members?.find((member) => member.id !== data.message.senderId)
     if (recipient) {
       chatStore.sendMessage({ ...data, participant: recipient })
-
       resetForm()
       return
     }
