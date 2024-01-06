@@ -9,7 +9,7 @@ import { BASE_URL } from '@/api'
 import { NotificationType } from './types'
 import { useChatStore } from '@/store/chatStore'
 import { useUserStore } from '@/store/userStore'
-import type { SendMessageSocket, RemoveChatSocket } from './types'
+import type { SendMessageSocket, RemoveChatSocket, UpdateUserSocket } from './types'
 
 const chatStore = useChatStore()
 const userStore = useUserStore()
@@ -23,6 +23,8 @@ onMounted(() => {
 
   socket.on(NotificationType.SEND_MESSAGE, handleSendMessage)
   socket.on(NotificationType.REMOVE_CHAT, handleRemoveChat)
+  socket.on(NotificationType.UPDATE_USER, handleUpdateUser)
+  socket.on(NotificationType.UPDATE_MESSAGE, handleUpdateMessage)
   return () => {
     socket.disconnect()
   }
@@ -49,8 +51,18 @@ const handleSendMessage = async (sendMessageData: SendMessageSocket) => {
 
 const handleRemoveChat = async (removeChatData: RemoveChatSocket) => {
   if ((window as any)?.socket?.id === removeChatData.socketId) return
-
   chatStore.removeChat(removeChatData.payload.chatId)
+}
+
+const handleUpdateUser = (updateUserData: UpdateUserSocket) => {
+  if ((window as any)?.socket?.id === updateUserData.socketId) return
+  console.log(updateUserData)
+  chatStore.updateUserOnSocket(updateUserData.payload)
+}
+
+const handleUpdateMessage = (data: any) => {
+  console.log(data);
+  
 }
 </script>
 

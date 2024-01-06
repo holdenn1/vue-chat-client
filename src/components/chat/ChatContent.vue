@@ -7,11 +7,17 @@
       <div class="chat-header">
         <img class="arrow-back" @click="closeChat" src="@/icons/icons8-left-arrow-48.png" alt="" />
         <div class="member-wrapper">
-          <img class="member-avatar" :src="currentMember?.photo" alt="" />
-          <span class="member-name">{{ currentMember?.nickname }}</span>
+          <img
+            class="member-avatar"
+            :src="currentChat?.member.photo ?? currentMember?.photo"
+            alt=""
+          />
+          <span class="member-name">{{
+            currentChat?.member.nickname ?? currentMember?.nickname
+          }}</span>
         </div>
       </div>
-      <div ref="chatContainer" class="chat-content">
+      <div @click="isShowMenu = false" ref="chatContainer" class="chat-content">
         <Transition>
           <div v-show="isArrowShow" class="arrow-down-wrapper">
             <img
@@ -24,6 +30,8 @@
         </Transition>
         <template v-for="(message, inx) of chatStore.chatState.messages" :key="message.id">
           <div
+            @dblclick="() => handleLike(message)"
+            @contextmenu.stop.prevent="(e) => handleContextMenu(e, message)"
             :class="[
               message.senderId === userStore.userState.user?.id
                 ? 'message-of-sender'
@@ -31,6 +39,12 @@
             ]"
           >
             <p>{{ message.message }}</p>
+            <img
+              v-show="message.isLike"
+              class="message-like"
+              :src="message.senderId === userStore.userState.user?.id ? likeSender : likeRecipient"
+              alt=""
+            />
             <span class="message-date">{{ correctDate(message.createdDate) }}</span>
           </div>
           <div v-if="showDateBlock(inx)">
@@ -39,6 +53,19 @@
             </div>
           </div>
         </template>
+        <ul
+          v-show="isShowMenu"
+          @click.stop
+          class="chat-menu"
+          :style="`top:${pointsMenu.y}px; left:${pointsMenu.x}px;`"
+        >
+          <li class="chat-menu__item">
+            <img class="chat-menu__item-icon" src="@/icons/menu-edit.png" alt="" /> Edit
+          </li>
+          <li class="chat-menu__item">
+            <img class="chat-menu__item-icon" src="@/icons/menu-remove.png" alt="" /> Remove
+          </li>
+        </ul>
         <div ref="div"></div>
       </div>
       <div class="chat-message-form-wrapper">
@@ -52,11 +79,17 @@
 import ChatForm from 'components/forms/ChatForm.vue'
 import ChatError from '../errors/ChatError.vue'
 
+import likeSender from '@/icons/like.png'
+import likeRecipient from '@/icons/like2.png'
+
 import { useChatStore } from '@/store/chatStore'
 import { useUserStore } from '@/store/userStore'
+
 import { useRoute, useRouter } from 'vue-router'
-import { nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+
 import type { User } from '@/store/types/userStoreTypes'
+import type { Message } from '@/store/types/chatStoreTypes'
 
 defineProps<{ currentMember: User | undefined }>()
 
@@ -66,11 +99,14 @@ const userStore = useUserStore()
 const route = useRoute()
 const router = useRouter()
 
-const loading = ref(false)
 const div = ref()
+const loading = ref(false)
 const chatContainer = ref()
 const isArrowShow = ref()
 const scrollTopTo = ref(0)
+
+const isShowMenu = ref<boolean>(false)
+const pointsMenu = ref({ x: 0, y: 0 })
 
 function closeChat() {
   chatStore.setShowChat(false)
@@ -89,6 +125,21 @@ const observer = new IntersectionObserver(async ([entry]) => {
     loading.value = false
   }
 })
+
+const currentChat = computed(() => {
+  if (route.query.chatId) {
+    return chatStore.chatState.chats.find((chat) => chat.id === +(route.query.chatId as string))
+  }
+  return null
+})
+
+const handleLike = (message: Message) => {
+  if (message.senderId !== userStore.userState.user?.id) {
+    if (currentChat.value?.member.id) {
+      chatStore.setLikeAction(message, currentChat.value.member.id)
+    }
+  }
+}
 
 onMounted(() => {
   observer.observe(div.value)
@@ -162,6 +213,20 @@ function handleScroll() {
     isArrowShow.value = false
   }
 }
+
+function handleContextMenu(e: MouseEvent, message: Message) {
+  if (message.senderId !== userStore.userState.user?.id) {
+    return
+  }
+  const rect = chatContainer.value.getBoundingClientRect()
+
+  let xRelativeToBlock = e.clientX - rect.left - 200
+  let yRelativeToBlock = e.clientY - rect.top - 80
+
+  isShowMenu.value = true
+
+  pointsMenu.value = { x: xRelativeToBlock, y: yRelativeToBlock }
+}
 </script>
 
 <style lang="scss" scoped>
@@ -215,6 +280,26 @@ function handleScroll() {
       padding: 10px;
       position: relative;
       @include scrollbar(4px, black);
+      .chat-menu {
+        width: 180px;
+
+        background-color: rgb(220, 220, 220);
+        position: absolute;
+        border-radius: 12px;
+        overflow: hidden;
+        &__item {
+          padding: 8px 10px;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          &:hover {
+            background-color: rgb(201, 201, 201);
+          }
+        }
+        &__item-icon {
+          margin-right: 12px;
+        }
+      }
       .arrow-down-wrapper {
         position: absolute;
         z-index: 1000;
@@ -249,6 +334,20 @@ function handleScroll() {
         background-color: #2baadd;
         margin-right: auto;
         text-align: left;
+        .message-like {
+          display: block;
+          margin-left: auto;
+          width: 16px;
+          height: 16px;
+        }
+      }
+      .message-of-sender {
+        .message-like {
+          display: block;
+          margin-right: auto;
+          width: 16px;
+          height: 16px;
+        }
       }
 
       .message-of-recipient,
@@ -261,6 +360,7 @@ function handleScroll() {
         position: relative;
         font-weight: 500;
         line-height: 120%;
+        cursor: pointer;
 
         .message-date {
           position: absolute;

@@ -17,3 +17,10 @@ export type SendMessageData = {
 export type UpdateUserData = {
   nickname?: string
 }
+
+export type UpdateMessageData ={
+  id: number;
+  message?: string;
+  isLike?:boolean
+  recipientId: number
+}

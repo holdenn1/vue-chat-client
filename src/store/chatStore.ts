@@ -11,7 +11,8 @@ import {
   fetchChatsRequest,
   fetchMessagesRequest,
   removeChatRequest,
-  searchMembersByNickname
+  searchMembersByNickname,
+  updateMessageRequest
 } from '@/api/requests'
 import type { User } from './types/userStoreTypes'
 import { useRoute, useRouter } from 'vue-router'
@@ -70,7 +71,7 @@ export const useChatStore = defineStore('chat', () => {
     chatState.value.recommendationMembers = members
   }
 
-  async function sendMessage(data: SendMessageResponse) {
+  function sendMessage(data: SendMessageResponse) {
     try {
       if (!data) {
         throw new Error()
@@ -137,11 +138,44 @@ export const useChatStore = defineStore('chat', () => {
   }
 
   function removeChat(chatId: number) {
-    chatState.value.messages = []
     chatState.value.chats = chatState.value.chats.filter((chat) => chat.id !== chatId)
+    if (+(route.query.chatId as string) === chatId) {
+      chatState.value.messages = []
+      setShowChat(false)
+      router.replace({ name: 'chats' })
+    }
+  }
 
-    setShowChat(false)
-    router.replace({ name: 'chats' })
+  function updateUserOnSocket(user: User) {
+    chatState.value.chats = chatState.value.chats.map((chat) => {
+      if (chat.member.id === user.id) {
+        chat.member = user
+      }
+      return chat
+    })
+  }
+
+  async function setLikeAction(message: Message, recipientId: number) {
+    try {
+      const { data }: { data: Message } = await updateMessageRequest({
+        id: message.id,
+        isLike: !message.isLike,
+        recipientId
+      })
+
+      updateMessage(data)
+    } catch (e) {
+      console.error(e)
+    }
+  }
+
+  function updateMessage(data: Message) {
+    chatState.value.messages = chatState.value.messages.map((message) => {
+      if (message.id === data.id) {
+        message = data
+      }
+      return message
+    })
   }
 
   function setCurrentMessagesPage(page: number) {
@@ -166,8 +200,11 @@ export const useChatStore = defineStore('chat', () => {
     fetchChats,
     setShowChat,
     sendMessage,
+    updateMessage,
     fetchMessages,
+    setLikeAction,
     removeChatAction,
+    updateUserOnSocket,
     searchMembersByEmail,
     setCurrentMessagesPage,
     setShowRecommendationMember,

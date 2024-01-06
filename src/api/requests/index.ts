@@ -1,6 +1,12 @@
 import instance from '@/api'
 import axios from 'axios'
-import type { LoginUserData, RegistrationUserData, SendMessageData, UpdateUserData } from './types'
+import type {
+  LoginUserData,
+  RegistrationUserData,
+  SendMessageData,
+  UpdateUserData,
+  UpdateMessageData
+} from './types'
 
 export const BASE_URL = 'http://localhost:8000/'
 
@@ -46,3 +52,6 @@ export const fetchMessagesRequest = (chatId: string, currentPage: string) =>
 
 export const removeChatRequest = (recipientId: string) =>
   instance.delete(`chat/remove-chat/${recipientId}`)
+
+export const updateMessageRequest = (data: UpdateMessageData) =>
+  instance.put('chat/update-message', data)
