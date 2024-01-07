@@ -44,3 +44,9 @@ export type RemoveChatData = {
     chatId: number
   }
 }
+
+export type EditMessageProps = {
+  id: number
+  message: string
+  recipientId: number
+}

@@ -55,3 +55,6 @@ export const removeChatRequest = (recipientId: string) =>
 
 export const updateMessageRequest = (data: UpdateMessageData) =>
   instance.put('chat/update-message', data)
+
+export const removeMessageRequest = (messageId: string, recipientId: string) =>
+  instance.delete(`chat/remove-message/${messageId}/${recipientId}`)

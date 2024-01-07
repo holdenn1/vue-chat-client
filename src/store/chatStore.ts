@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import type {
   Chat,
+  EditMessageProps,
   InitialValuesChatStore,
   Message,
   RemoveChatData,
@@ -11,6 +12,7 @@ import {
   fetchChatsRequest,
   fetchMessagesRequest,
   removeChatRequest,
+  removeMessageRequest,
   searchMembersByNickname,
   updateMessageRequest
 } from '@/api/requests'
@@ -169,6 +171,16 @@ export const useChatStore = defineStore('chat', () => {
     }
   }
 
+  async function editMessageAction(editMessage: EditMessageProps) {
+    try {
+      const { data }: { data: Message } = await updateMessageRequest(editMessage)
+
+      updateMessage(data)
+    } catch (e) {
+      console.error(e)
+    }
+  }
+
   function updateMessage(data: Message) {
     chatState.value.messages = chatState.value.messages.map((message) => {
       if (message.id === data.id) {
@@ -176,6 +188,25 @@ export const useChatStore = defineStore('chat', () => {
       }
       return message
     })
+  }
+
+  async function removeMessageAction(messageId: number, recipientId: number) {
+    try {
+      const { data }: { data: Message } = await removeMessageRequest(
+        String(messageId),
+        String(recipientId)
+      )
+
+      removeMessage(data.id)
+    } catch (e) {
+      console.error(e)
+    }
+  }
+
+  function removeMessage(messageId: number) {
+    chatState.value.messages = chatState.value.messages.filter(
+      (message) => message.id !== messageId
+    )
   }
 
   function setCurrentMessagesPage(page: number) {
@@ -202,9 +233,12 @@ export const useChatStore = defineStore('chat', () => {
     sendMessage,
     updateMessage,
     fetchMessages,
+    removeMessage,
     setLikeAction,
     removeChatAction,
+    editMessageAction,
     updateUserOnSocket,
+    removeMessageAction,
     searchMembersByEmail,
     setCurrentMessagesPage,
     setShowRecommendationMember,

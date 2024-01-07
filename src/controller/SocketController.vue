@@ -9,7 +9,13 @@ import { BASE_URL } from '@/api'
 import { NotificationType } from './types'
 import { useChatStore } from '@/store/chatStore'
 import { useUserStore } from '@/store/userStore'
-import type { SendMessageSocket, RemoveChatSocket, UpdateUserSocket } from './types'
+import type {
+  SendMessageSocket,
+  RemoveChatSocket,
+  UpdateUserSocket,
+  UpdateMessageSocket,
+  RemoveMessageSocket
+} from './types'
 
 const chatStore = useChatStore()
 const userStore = useUserStore()
@@ -25,6 +31,7 @@ onMounted(() => {
   socket.on(NotificationType.REMOVE_CHAT, handleRemoveChat)
   socket.on(NotificationType.UPDATE_USER, handleUpdateUser)
   socket.on(NotificationType.UPDATE_MESSAGE, handleUpdateMessage)
+  socket.on(NotificationType.REMOVE_MESSAGE, handleRemoveMessage)
   return () => {
     socket.disconnect()
   }
@@ -32,8 +39,6 @@ onMounted(() => {
 
 const handleSendMessage = async (sendMessageData: SendMessageSocket) => {
   if ((window as any)?.socket?.id === sendMessageData.socketId) return
-
-  console.log(sendMessageData)
 
   if (sendMessageData.payload && userStore.userState.user) {
     if (sendMessageData.payload.chat?.members) {
@@ -56,13 +61,17 @@ const handleRemoveChat = async (removeChatData: RemoveChatSocket) => {
 
 const handleUpdateUser = (updateUserData: UpdateUserSocket) => {
   if ((window as any)?.socket?.id === updateUserData.socketId) return
-  console.log(updateUserData)
   chatStore.updateUserOnSocket(updateUserData.payload)
 }
 
-const handleUpdateMessage = (data: any) => {
-  console.log(data);
-  
+const handleUpdateMessage = (updateMessageData: UpdateMessageSocket) => {
+  if ((window as any)?.socket?.id === updateMessageData.socketId) return
+  chatStore.updateMessage(updateMessageData.payload)
+}
+
+const handleRemoveMessage = (removeMessageData: RemoveMessageSocket) => {
+  if ((window as any)?.socket?.id === removeMessageData.socketId) return
+  chatStore.removeMessage(removeMessageData.payload.id)
 }
 </script>
 

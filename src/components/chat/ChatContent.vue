@@ -59,17 +59,51 @@
           class="chat-menu"
           :style="`top:${pointsMenu.y}px; left:${pointsMenu.x}px;`"
         >
-          <li class="chat-menu__item">
+          <li
+            @click="
+              () => {
+                isEditMessage = true
+                editMessage = messageForAction
+                isShowMenu = false
+              }
+            "
+            class="chat-menu__item"
+          >
             <img class="chat-menu__item-icon" src="@/icons/menu-edit.png" alt="" /> Edit
           </li>
-          <li class="chat-menu__item">
+          <li @click="handleRemoveMessage" class="chat-menu__item">
             <img class="chat-menu__item-icon" src="@/icons/menu-remove.png" alt="" /> Remove
           </li>
         </ul>
         <div ref="div"></div>
       </div>
+      <div v-show="isEditMessage" class="edit-message-container">
+        <p class="edit-message">
+          {{ editMessage?.message }}
+        </p>
+        <img
+          @click="
+            () => {
+              editMessage = null
+              isEditMessage = false
+            }
+          "
+          class="close-edit-message-icon"
+          src="@/icons/cross.png"
+          alt=""
+        />
+      </div>
       <div class="chat-message-form-wrapper">
-        <ChatForm :recipient="currentMember" />
+        <ChatForm
+          :recipient="currentMember"
+          :edit-message="editMessage"
+          @edit-message="
+            () => {
+              editMessage = null
+              isEditMessage = false
+            }
+          "
+        />
       </div>
     </div>
   </div>
@@ -91,7 +125,7 @@ import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import type { User } from '@/store/types/userStoreTypes'
 import type { Message } from '@/store/types/chatStoreTypes'
 
-defineProps<{ currentMember: User | undefined }>()
+const props = defineProps<{ currentMember: User | undefined }>()
 
 const chatStore = useChatStore()
 const userStore = useUserStore()
@@ -108,11 +142,9 @@ const scrollTopTo = ref(0)
 const isShowMenu = ref<boolean>(false)
 const pointsMenu = ref({ x: 0, y: 0 })
 
-function closeChat() {
-  chatStore.setShowChat(false)
-  chatStore.clearChat()
-  router.push({ name: 'chats' })
-}
+const messageForAction = ref<Message | null>(null)
+const editMessage = ref<Message | null>(null)
+const isEditMessage = ref<boolean>(false)
 
 const observer = new IntersectionObserver(async ([entry]) => {
   if (entry.isIntersecting && !loading.value) {
@@ -132,14 +164,6 @@ const currentChat = computed(() => {
   }
   return null
 })
-
-const handleLike = (message: Message) => {
-  if (message.senderId !== userStore.userState.user?.id) {
-    if (currentChat.value?.member.id) {
-      chatStore.setLikeAction(message, currentChat.value.member.id)
-    }
-  }
-}
 
 onMounted(() => {
   observer.observe(div.value)
@@ -169,6 +193,21 @@ watch(
     })
   }
 )
+
+function handleLike(message: Message) {
+  if (message.senderId !== userStore.userState.user?.id) {
+    if (currentChat.value?.member.id) {
+      chatStore.setLikeAction(message, currentChat.value.member.id)
+    }
+  }
+}
+
+function closeChat() {
+  chatStore.setShowChat(false)
+  chatStore.clearChat()
+  router.push({ name: 'chats' })
+}
+
 function correctDate(dateTimeString: Date) {
   const dateTime = new Date(dateTimeString)
   const hours = dateTime.getHours()
@@ -218,6 +257,9 @@ function handleContextMenu(e: MouseEvent, message: Message) {
   if (message.senderId !== userStore.userState.user?.id) {
     return
   }
+
+  messageForAction.value = message
+
   const rect = chatContainer.value.getBoundingClientRect()
 
   let xRelativeToBlock = e.clientX - rect.left - 200
@@ -226,6 +268,14 @@ function handleContextMenu(e: MouseEvent, message: Message) {
   isShowMenu.value = true
 
   pointsMenu.value = { x: xRelativeToBlock, y: yRelativeToBlock }
+}
+
+function handleRemoveMessage() {
+  if (messageForAction.value && props.currentMember) {
+    chatStore.removeMessageAction(messageForAction.value?.id, props.currentMember.id)
+    messageForAction.value = null
+    isShowMenu.value = false
+  }
 }
 </script>
 
@@ -361,6 +411,8 @@ function handleContextMenu(e: MouseEvent, message: Message) {
         font-weight: 500;
         line-height: 120%;
         cursor: pointer;
+        word-wrap: break-word;
+        overflow-wrap: break-word; 
 
         .message-date {
           position: absolute;
@@ -380,6 +432,31 @@ function handleContextMenu(e: MouseEvent, message: Message) {
       background-color: rgb(73, 10, 144);
       padding: 20px;
       flex-shrink: 0;
+    }
+
+    .edit-message-container {
+      width: 100%;
+      height: 60px;
+      background-color: #bd9cf0;
+      display: flex;
+      align-items: center;
+      padding: 10px;
+      position: relative;
+      .edit-message {
+        display: block;
+        max-width: 45vw;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .close-edit-message-icon {
+        position: absolute;
+        top: 50%;
+        right: 12px;
+        transform: translate(0, -50%);
+        cursor: pointer;
+      }
     }
   }
 }

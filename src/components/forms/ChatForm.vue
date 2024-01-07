@@ -1,5 +1,5 @@
 <template>
-  <form @submit="onSubmit" class="chat-message-form">
+  <form @submit="submitForm" class="chat-message-form">
     <textarea
       v-model="message"
       v-bind="messageAtr"
@@ -15,15 +15,34 @@
 <script setup lang="ts">
 import { sendMessageRequest } from '@/api/requests'
 import { useChatStore } from '@/store/chatStore'
-import type { SendMessageResponse } from '@/store/types/chatStoreTypes'
+import type { Message, SendMessageResponse } from '@/store/types/chatStoreTypes'
 import type { User } from '@/store/types/userStoreTypes'
 
 import { useForm } from 'vee-validate'
+import { computed, toRefs, watch } from 'vue'
 import * as yup from 'yup'
 
 const props = defineProps<{
   recipient: User | undefined
+  editMessage: Message | null
 }>()
+
+const emit = defineEmits<{
+  (e: 'edit-message'): void
+}>()
+
+const { editMessage } = toRefs(props)
+
+watch(
+  () => editMessage.value,
+  () => {
+    if (editMessage.value?.message.length) {
+      message.value = editMessage.value.message
+    } else {
+      message.value = ''
+    }
+  }
+)
 
 const chatStore = useChatStore()
 
@@ -36,7 +55,7 @@ const { handleSubmit, defineField, isSubmitting } = useForm({
 
 const [message, messageAtr] = defineField('message')
 
-const onSubmit = handleSubmit(async ({ message }, { resetForm }) => {
+const handleSendMessage = handleSubmit(async ({ message }, { resetForm }) => {
   if (!message.length) return
 
   if (props.recipient) {
@@ -55,6 +74,25 @@ const onSubmit = handleSubmit(async ({ message }, { resetForm }) => {
     resetForm()
   }
 })
+
+const handleEditMessage = handleSubmit(async ({ message }, { resetForm }) => {
+  try {
+    if (!message.length) return
+    if (props.recipient && editMessage.value) {
+      chatStore.editMessageAction({
+        id: editMessage.value.id,
+        message,
+        recipientId: props.recipient.id
+      })
+      resetForm()
+      emit('edit-message')
+    }
+  } catch (e) {
+    console.error(e)
+  }
+})
+
+const submitForm = computed(() => (editMessage.value ? handleEditMessage : handleSendMessage))
 </script>
 
 <style lang="scss" scoped>
