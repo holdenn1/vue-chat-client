@@ -11,7 +11,6 @@ export type Message = {
 }
 
 export type InitialValuesChatStore = {
-  messages: Message[]
   isShowChat: boolean
   recommendationMembers: User[]
   isRecommendationMembers: boolean
@@ -21,20 +20,22 @@ export type InitialValuesChatStore = {
 }
 
 export type SendMessageResponse = {
-  chat?: {
+  chat: {
     id: number
     members?: User[]
+    lastReadMessageDate: Date
     createdDate: Date
     updatedDate: Date
   }
   message: Message
   recipientId: number
-  participant?: User
 }
 
 export type Chat = {
   id: number
   member: User
+  messages: Message[]
+  lastReadMessageDate: Date
   createdDate: Date
   updatedDate: Date
 }

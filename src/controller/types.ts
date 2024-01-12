@@ -1,4 +1,4 @@
-import type { Message, SendMessageResponse } from '@/store/types/chatStoreTypes'
+import type { Chat, Message, SendMessageResponse } from '@/store/types/chatStoreTypes'
 import type { User } from '@/store/types/userStoreTypes'
 
 export enum NotificationType {
@@ -11,14 +11,12 @@ export enum NotificationType {
 
 export type SendMessageSocket = {
   socketId: string
-  payload: Omit<SendMessageResponse, 'participant'>
+  payload: SendMessageResponse
 }
 
 export type RemoveChatSocket = {
   socketId: string
-  payload: {
-    chatId: number
-  }
+  payload: Chat
 }
 
 export type UpdateUserSocket = {

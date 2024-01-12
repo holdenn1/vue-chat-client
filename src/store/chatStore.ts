@@ -1,3 +1,4 @@
+import { useUserStore } from './userStore'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import type {
@@ -22,7 +23,6 @@ import { useRoute, useRouter } from 'vue-router'
 export const useChatStore = defineStore('chat', () => {
   const chatState = ref<InitialValuesChatStore>({
     isShowChat: false,
-    messages: [],
     recommendationMembers: [],
     isRecommendationMembers: false,
     chats: [],
@@ -83,26 +83,32 @@ export const useChatStore = defineStore('chat', () => {
         router.push({ query: { chatId: data.chat?.id } })
       }
 
-      if (data.chat?.members && data.participant) {
+      if (data.chat.members) {
         chatState.value.chats.unshift({
           id: data.chat.id,
-          member: data.participant,
+          member: data.chat.members.find((user) => user.id !== useUserStore().userState.user?.id),
           createdDate: data.chat.createdDate,
-          updatedDate: data.chat.updatedDate
+          updatedDate: data.chat.updatedDate,
+          lastReadMessageDate: data.chat.lastReadMessageDate,
+          messages: [data.message]
+        } as Chat)
+      } else {
+        chatState.value.chats = chatState.value.chats.map((chat) => {
+          if (chat.id === data.message.chatId) {
+            chat.messages.unshift(data.message)
+          }
+          return chat
         })
+        const chatToUpdate = chatState.value.chats.find((chat) => chat.id === data.chat.id)
+  
+        if (chatToUpdate) {
+          chatState.value.chats = [
+            chatToUpdate,
+            ...chatState.value.chats.filter((chat) => chat.id !== data.message.chatId)
+          ]
+        }
       }
 
-      const chatToUpdate = chatState.value.chats.find((chat) => chat.id === data.message.chatId)
-      if (chatToUpdate) {
-        chatState.value.chats = [
-          chatToUpdate,
-          ...chatState.value.chats.filter((chat) => chat.id !== data.message.chatId)
-        ]
-      }
-
-      if (+(route.query.chatId as string) === data.message.chatId) {
-        chatState.value.messages.unshift(data.message)
-      }
     } catch (e) {
       console.error(e)
     }
@@ -114,11 +120,24 @@ export const useChatStore = defineStore('chat', () => {
         chatId,
         String(chatState.value.currentMessagesPage)
       )
-      if (data.length) {
-        const oldMessages = chatState.value.messages.map((message) => message.id)
-        const newMessages = data.filter((message) => !oldMessages.includes(message.id))
 
-        chatState.value.messages = [...chatState.value.messages, ...newMessages]
+      if (data.length) {
+        const oldMessagesIds = chatState.value.chats.reduce((acum: number[], chat) => {
+          if (chat.id === +chatId) {
+            acum = chat.messages.map((message) => message.id)
+          }
+          return acum
+        }, [])
+
+        const newMessages = data.filter((message) => !oldMessagesIds.includes(message.id))
+
+        chatState.value.chats = chatState.value.chats.map((chat) => {
+          if (chat.id === +chatId) {
+            chat.messages = [...chat.messages, ...newMessages]
+          }
+          return chat
+        })
+
         chatState.value.currentMessagesPage += 1
       }
     } catch (e) {
@@ -128,7 +147,7 @@ export const useChatStore = defineStore('chat', () => {
 
   async function removeChatAction(chat: Chat) {
     try {
-      const { data }: RemoveChatData = await removeChatRequest(String(chat.member.id))
+      const { data }: RemoveChatData = await removeChatRequest(String(chat.id))
 
       if (!data) {
         throw new Error()
@@ -142,7 +161,6 @@ export const useChatStore = defineStore('chat', () => {
   function removeChat(chatId: number) {
     chatState.value.chats = chatState.value.chats.filter((chat) => chat.id !== chatId)
     if (+(route.query.chatId as string) === chatId) {
-      chatState.value.messages = []
       setShowChat(false)
       router.replace({ name: 'chats' })
     }
@@ -182,11 +200,16 @@ export const useChatStore = defineStore('chat', () => {
   }
 
   function updateMessage(data: Message) {
-    chatState.value.messages = chatState.value.messages.map((message) => {
-      if (message.id === data.id) {
-        message = data
+    chatState.value.chats = chatState.value.chats.map((chat) => {
+      if (chat.id === data.chatId) {
+        chat.messages = chat.messages.map((message) => {
+          if (message.id === data.id) {
+            message = data
+          }
+          return message
+        })
       }
-      return message
+      return chat
     })
   }
 
@@ -197,16 +220,19 @@ export const useChatStore = defineStore('chat', () => {
         String(recipientId)
       )
 
-      removeMessage(data.id)
+      removeMessage(data)
     } catch (e) {
       console.error(e)
     }
   }
 
-  function removeMessage(messageId: number) {
-    chatState.value.messages = chatState.value.messages.filter(
-      (message) => message.id !== messageId
-    )
+  function removeMessage(data: Message) {
+    chatState.value.chats = chatState.value.chats.map((chat) => {
+      if (chat.id === data.chatId) {
+        chat.messages = chat.messages.filter((message) => message.id !== data.id)
+      }
+      return chat
+    })
   }
 
   function setCurrentMessagesPage(page: number) {
@@ -220,13 +246,8 @@ export const useChatStore = defineStore('chat', () => {
     chatState.value.isRecommendationMembers = isShow
   }
 
-  function clearChat() {
-    chatState.value.messages = []
-  }
-
   return {
     chatState,
-    clearChat,
     removeChat,
     fetchChats,
     setShowChat,

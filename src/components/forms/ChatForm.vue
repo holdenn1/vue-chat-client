@@ -15,6 +15,7 @@
 <script setup lang="ts">
 import { sendMessageRequest } from '@/api/requests'
 import { useChatStore } from '@/store/chatStore'
+
 import type { Message, SendMessageResponse } from '@/store/types/chatStoreTypes'
 import type { User } from '@/store/types/userStoreTypes'
 
@@ -29,6 +30,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: 'edit-message'): void
+  (e: 'send-message'):void
 }>()
 
 const { editMessage } = toRefs(props)
@@ -64,13 +66,9 @@ const handleSendMessage = handleSubmit(async ({ message }, { resetForm }) => {
       message
     })
 
-    const recipient = data.chat?.members?.find((member) => member.id !== data.message.senderId)
-    if (recipient) {
-      chatStore.sendMessage({ ...data, participant: recipient })
-      resetForm()
-      return
-    }
+  
     chatStore.sendMessage(data)
+    emit('send-message')
     resetForm()
   }
 })

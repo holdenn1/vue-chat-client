@@ -8,7 +8,6 @@ import { Manager } from 'socket.io-client'
 import { BASE_URL } from '@/api'
 import { NotificationType } from './types'
 import { useChatStore } from '@/store/chatStore'
-import { useUserStore } from '@/store/userStore'
 import type {
   SendMessageSocket,
   RemoveChatSocket,
@@ -18,7 +17,6 @@ import type {
 } from './types'
 
 const chatStore = useChatStore()
-const userStore = useUserStore()
 
 onMounted(() => {
   const manager = new Manager(BASE_URL, {
@@ -40,23 +38,14 @@ onMounted(() => {
 const handleSendMessage = async (sendMessageData: SendMessageSocket) => {
   if ((window as any)?.socket?.id === sendMessageData.socketId) return
 
-  if (sendMessageData.payload && userStore.userState.user) {
-    if (sendMessageData.payload.chat?.members) {
-      const sender = sendMessageData.payload.chat.members.find(
-        (member) => member.id === sendMessageData.payload.message.senderId
-      )
-      if (sender) {
-        chatStore.sendMessage({ ...sendMessageData.payload, participant: sender })
-        return
-      }
-    }
-    chatStore.sendMessage(sendMessageData.payload)
-  }
+  chatStore.sendMessage(sendMessageData.payload)
 }
 
 const handleRemoveChat = async (removeChatData: RemoveChatSocket) => {
   if ((window as any)?.socket?.id === removeChatData.socketId) return
-  chatStore.removeChat(removeChatData.payload.chatId)
+  console.log(removeChatData);
+  
+  chatStore.removeChat(removeChatData.payload.id)
 }
 
 const handleUpdateUser = (updateUserData: UpdateUserSocket) => {
@@ -71,7 +60,9 @@ const handleUpdateMessage = (updateMessageData: UpdateMessageSocket) => {
 
 const handleRemoveMessage = (removeMessageData: RemoveMessageSocket) => {
   if ((window as any)?.socket?.id === removeMessageData.socketId) return
-  chatStore.removeMessage(removeMessageData.payload.id)
+  console.log(removeMessageData);
+  
+  chatStore.removeMessage(removeMessageData.payload)
 }
 </script>
 

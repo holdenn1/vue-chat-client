@@ -44,17 +44,16 @@ export const searchMembersByNickname = (nickname: string) =>
 export const sendMessageRequest = (data: SendMessageData) =>
   instance.post(`chat/send-message`, data)
 
-export const fetchChatsRequest = (currentPage: string) =>
-  instance.get(`chat/get-chats?&page=${currentPage}&pageSize=25`)
-
-export const fetchMessagesRequest = (chatId: string, currentPage: string) =>
-  instance.get(`chat/get-messages/${chatId}?&page=${currentPage}&pageSize=20`)
-
-export const removeChatRequest = (recipientId: string) =>
-  instance.delete(`chat/remove-chat/${recipientId}`)
-
 export const updateMessageRequest = (data: UpdateMessageData) =>
   instance.put('chat/update-message', data)
 
 export const removeMessageRequest = (messageId: string, recipientId: string) =>
   instance.delete(`chat/remove-message/${messageId}/${recipientId}`)
+
+export const fetchMessagesRequest = (chatId: string, currentPage: string) =>
+  instance.get(`chat/get-messages/${chatId}?&page=${currentPage}&pageSize=10`)
+
+export const fetchChatsRequest = (currentPage: string) =>
+  instance.get(`chat/get-chats?&page=${currentPage}&pageSize=25`)
+
+export const removeChatRequest = (chatId: string) => instance.delete(`chat/remove-chat/${chatId}`)

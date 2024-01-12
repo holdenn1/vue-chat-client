@@ -28,7 +28,7 @@
             />
           </div>
         </Transition>
-        <template v-for="(message, inx) of chatStore.chatState.messages" :key="message.id">
+        <template v-for="(message, inx) of currentChat?.messages" :key="message.id">
           <div
             @dblclick="() => handleLike(message)"
             @contextmenu.stop.prevent="(e) => handleContextMenu(e, message)"
@@ -97,6 +97,13 @@
         <ChatForm
           :recipient="currentMember"
           :edit-message="editMessage"
+          @send-message="
+            () => {
+              nextTick(() => {
+                scrollToElement()
+              })
+            }
+          "
           @edit-message="
             () => {
               editMessage = null
@@ -146,23 +153,24 @@ const messageForAction = ref<Message | null>(null)
 const editMessage = ref<Message | null>(null)
 const isEditMessage = ref<boolean>(false)
 
+const currentChat = computed(() => {
+  const chatId = route.query.chatId as string
+  if (chatId) {
+    return chatStore.chatState.chats.find((chat) => chat.id === +chatId)
+  }
+  return null
+})
+
 const observer = new IntersectionObserver(async ([entry]) => {
   if (entry.isIntersecting && !loading.value) {
     loading.value = true
 
-    if (route.query.chatId) {
+    if (route.query.chatId && chatStore.chatState.currentMessagesPage !== 1) {
       chatStore.fetchMessages(route.query.chatId as string)
     }
 
     loading.value = false
   }
-})
-
-const currentChat = computed(() => {
-  if (route.query.chatId) {
-    return chatStore.chatState.chats.find((chat) => chat.id === +(route.query.chatId as string))
-  }
-  return null
 })
 
 onMounted(() => {
@@ -179,18 +187,8 @@ watch(
   async () => {
     if (route.query.chatId) {
       chatStore.setCurrentMessagesPage(1)
-      chatStore.clearChat()
       chatStore.fetchMessages(route.query.chatId as string)
     }
-  }
-)
-
-watch(
-  () => chatStore.chatState.messages.length,
-  () => {
-    nextTick(() => {
-      scrollToElement()
-    })
   }
 )
 
@@ -204,7 +202,6 @@ function handleLike(message: Message) {
 
 function closeChat() {
   chatStore.setShowChat(false)
-  chatStore.clearChat()
   router.push({ name: 'chats' })
 }
 
@@ -217,12 +214,12 @@ function correctDate(dateTimeString: Date) {
 }
 
 function showDateBlock(index: number) {
-  if (index === chatStore.chatState.messages.length - 1) return true
-
-  const currentDate = new Date(chatStore.chatState.messages[index].createdDate)
-  const nextDate = new Date(chatStore.chatState.messages[index + 1].createdDate)
-
-  return currentDate.toDateString() !== nextDate.toDateString()
+  if (currentChat.value?.messages) {
+    if (index === currentChat.value.messages.length - 1) return true
+    const currentDate = new Date(currentChat.value.messages[index].createdDate)
+    const nextDate = new Date(currentChat.value.messages[index + 1].createdDate)
+    return currentDate.toDateString() !== nextDate.toDateString()
+  }
 }
 
 function formatDate(dateString: Date) {
@@ -412,7 +409,7 @@ function handleRemoveMessage() {
         line-height: 120%;
         cursor: pointer;
         word-wrap: break-word;
-        overflow-wrap: break-word; 
+        overflow-wrap: break-word;
 
         .message-date {
           position: absolute;

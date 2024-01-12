@@ -105,7 +105,6 @@ function setMember(member: User) {
     router.push({ query: { chatId: hasChat.id } })
   } else {
     router.push({ name: 'chats', query: { previewChat: 'true' } })
-    chatStore.clearChat()
   }
   clearMembers()
 }
