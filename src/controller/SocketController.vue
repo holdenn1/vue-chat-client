@@ -43,13 +43,14 @@ const handleSendMessage = async (sendMessageData: SendMessageSocket) => {
 
 const handleRemoveChat = async (removeChatData: RemoveChatSocket) => {
   if ((window as any)?.socket?.id === removeChatData.socketId) return
-  console.log(removeChatData);
-  
+  console.log(removeChatData)
+
   chatStore.removeChat(removeChatData.payload.id)
 }
 
 const handleUpdateUser = (updateUserData: UpdateUserSocket) => {
   if ((window as any)?.socket?.id === updateUserData.socketId) return
+
   chatStore.updateUserOnSocket(updateUserData.payload)
 }
 
@@ -60,8 +61,7 @@ const handleUpdateMessage = (updateMessageData: UpdateMessageSocket) => {
 
 const handleRemoveMessage = (removeMessageData: RemoveMessageSocket) => {
   if ((window as any)?.socket?.id === removeMessageData.socketId) return
-  console.log(removeMessageData);
-  
+
   chatStore.removeMessage(removeMessageData.payload)
 }
 </script>

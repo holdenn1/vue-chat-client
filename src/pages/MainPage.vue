@@ -6,17 +6,21 @@
         <a class="main-page-navigation__google-link" :href="GOOGLE_AUTH">
           <img src="@/icons/icons8-google.svg" /> Continue with Google</a
         >
-        <router-link class="main-page-navigation__sign-up-link" :to="{ name: 'sign-in' }"
-          > <img src="@/icons/icons8-48.png" />Continue with email</router-link
+        <router-link class="main-page-navigation__sign-up-link" :to="{ name: 'sign-in' }">
+          <img src="@/icons/icons8-48.png" />Continue with email</router-link
         >
       </div>
-      <p class="main-page__text">Don't have an account yet? <router-link :to="{ name: 'sign-up' }"><span style="color: rgb(0, 85, 255);">Sign up</span> </router-link></p>
+      <p class="main-page__text">
+        Don't have an account yet?
+        <router-link :to="{ name: 'sign-up' }">
+          <span style="color: rgb(9 41 105)">Sign up</span>
+        </router-link>
+      </p>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-
 const GOOGLE_AUTH = 'http://localhost:8000/auth/google/redirect'
 </script>
 
@@ -58,7 +62,7 @@ const GOOGLE_AUTH = 'http://localhost:8000/auth/google/redirect'
     }
   }
 
-  &__text{
+  &__text {
     text-align: center;
     font-weight: 500;
   }

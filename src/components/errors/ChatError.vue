@@ -19,6 +19,8 @@
 }
 
 .chat-error-text{
+  display: block;
+  margin: 0 4px;
   font-size: 22px;
   font-weight: 500;
   text-align: center;

@@ -4,6 +4,7 @@ import { ref } from 'vue'
 import type {
   Chat,
   EditMessageProps,
+  FetchMessagesDate,
   InitialValuesChatStore,
   Message,
   RemoveChatData,
@@ -100,7 +101,7 @@ export const useChatStore = defineStore('chat', () => {
           return chat
         })
         const chatToUpdate = chatState.value.chats.find((chat) => chat.id === data.chat.id)
-  
+
         if (chatToUpdate) {
           chatState.value.chats = [
             chatToUpdate,
@@ -108,7 +109,6 @@ export const useChatStore = defineStore('chat', () => {
           ]
         }
       }
-
     } catch (e) {
       console.error(e)
     }
@@ -116,12 +116,19 @@ export const useChatStore = defineStore('chat', () => {
 
   async function fetchMessages(chatId: string) {
     try {
-      const { data }: { data: Message[] } = await fetchMessagesRequest(
+      const { data }: { data: FetchMessagesDate } = await fetchMessagesRequest(
         chatId,
         String(chatState.value.currentMessagesPage)
       )
 
-      if (data.length) {
+      chatState.value.chats = chatState.value.chats.map((chat) => {
+        if (chat.id === data.chatId) {
+          chat.lastReadMessageDate = data.lastReadMessageDate
+        }
+        return chat
+      })
+
+      if (data.messages) {
         const oldMessagesIds = chatState.value.chats.reduce((acum: number[], chat) => {
           if (chat.id === +chatId) {
             acum = chat.messages.map((message) => message.id)
@@ -129,7 +136,7 @@ export const useChatStore = defineStore('chat', () => {
           return acum
         }, [])
 
-        const newMessages = data.filter((message) => !oldMessagesIds.includes(message.id))
+        const newMessages = data.messages.filter((message) => !oldMessagesIds.includes(message.id))
 
         chatState.value.chats = chatState.value.chats.map((chat) => {
           if (chat.id === +chatId) {

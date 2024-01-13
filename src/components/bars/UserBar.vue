@@ -1,7 +1,8 @@
 <template>
   <div class="user-bar">
     <input class="upload-photo-input" type="file" @change="handleFileInputChange" />
-    <img :src="userStore.userState.user?.photo" alt="" class="user-avatar" />
+    <img class="user-avatar" :src="userStore.userState.user?.photo" alt="" />
+    <img class="logout" src="@/icons/logout.png" alt=""  @click="userStore.logoutUser()"/>
     <h4 class="user-name">
       <span
         :title="userStore.userState.user?.nickname"
@@ -88,6 +89,14 @@ onBeforeUnmount(() => {
   height: 60px;
   margin-bottom: 20px;
   position: relative;
+
+  .logout {
+    position: absolute;
+    top: 50%;
+    right: 12px;
+    transform: translate(0%, -50%);
+    cursor: pointer;
+  }
   .user-avatar {
     width: 48px;
     height: 48px;

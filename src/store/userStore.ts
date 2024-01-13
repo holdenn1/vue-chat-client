@@ -66,8 +66,6 @@ export const useUserStore = defineStore('user', () => {
   async function logoutUser() {
     try {
       await logoutUserRequest()
-      deleteCookie('refresh_token')
-      deleteCookie('access_token')
       userState.value.user = null
       router.push({ path: '/' })
     } catch (e) {

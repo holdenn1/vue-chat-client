@@ -51,3 +51,9 @@ export type EditMessageProps = {
   message: string
   recipientId: number
 }
+
+export type FetchMessagesDate = {
+  chatId: number
+  messages: Message[]
+  lastReadMessageDate: Date
+}

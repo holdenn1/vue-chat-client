@@ -1,5 +1,5 @@
 <template>
-  <div class="recommendation-members">
+  <div class="recommendation-members" :class="{ 'has-new-messages': hasNewMessages }">
     <img class="member-avatar" :src="chat.member.photo" alt="" />
     <img
       class="member-menu"
@@ -13,10 +13,33 @@
 
 <script setup lang="ts">
 import { useChatStore } from '@/store/chatStore'
+import { ref, toRefs, watchEffect } from 'vue'
+import { useRoute } from 'vue-router'
+
 import type { Chat } from '@/store/types/chatStoreTypes'
+import { useUserStore } from '@/store/userStore'
 
-defineProps<{ chat: Chat }>()
+const props = defineProps<{ chat: Chat }>()
 
+const { chat } = toRefs(props)
+const route = useRoute()
+
+const hasNewMessages = ref<boolean>(false)
+
+watchEffect(() => {
+  const chatId = route.query.chatId as string
+  const lastSendMessage = chat.value.messages[0]
+  
+  if (
+    lastSendMessage.createdDate > chat.value.lastReadMessageDate &&
+    lastSendMessage.senderId !== useUserStore().userState.user?.id
+  ) {
+    hasNewMessages.value = true
+  }
+  if (+chatId === chat.value.id) {
+    hasNewMessages.value = false
+  }
+})
 const chatStore = useChatStore()
 </script>
 
@@ -49,5 +72,9 @@ const chatStore = useChatStore()
     transform: translate(0, -50%);
     cursor: pointer;
   }
+}
+
+.has-new-messages {
+  background-color: #93a0f7;
 }
 </style>

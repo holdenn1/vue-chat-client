@@ -60,10 +60,13 @@ const {
       -webkit-appearance: none;
       margin: 0;
     }
+    &::placeholder {
+      color: #282828;
+    }
   }
   .error {
     text-align: center;
-    color: red;
+    color: #7f0000;
   }
 }
 </style>

@@ -1,9 +1,13 @@
 <template>
   <div class="chat-content-wrapper">
-    <ChatError v-show="!chatStore.chatState.isShowChat"
+    <ChatError v-show="!chatStore.chatState.isShowChat && !isMobileChat"
       >Select a chat to start a conversation</ChatError
     >
-    <div class="chat" v-show="chatStore.chatState.isShowChat">
+    <div
+      class="chat"
+      :class="{ 'mobile-chat': isMobileChat }"
+      v-show="chatStore.chatState.isShowChat"
+    >
       <div class="chat-header">
         <img class="arrow-back" @click="closeChat" src="@/icons/icons8-left-arrow-48.png" alt="" />
         <div class="member-wrapper">
@@ -125,9 +129,10 @@ import likeRecipient from '@/icons/like2.png'
 
 import { useChatStore } from '@/store/chatStore'
 import { useUserStore } from '@/store/userStore'
+import { useResize } from '@/hooks/useResize'
 
 import { useRoute, useRouter } from 'vue-router'
-import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch, watchEffect } from 'vue'
 
 import type { User } from '@/store/types/userStoreTypes'
 import type { Message } from '@/store/types/chatStoreTypes'
@@ -139,6 +144,8 @@ const userStore = useUserStore()
 
 const route = useRoute()
 const router = useRouter()
+
+const { resizeWindow } = useResize()
 
 const div = ref()
 const loading = ref(false)
@@ -152,6 +159,8 @@ const pointsMenu = ref({ x: 0, y: 0 })
 const messageForAction = ref<Message | null>(null)
 const editMessage = ref<Message | null>(null)
 const isEditMessage = ref<boolean>(false)
+
+const isMobileChat = ref<boolean>(false)
 
 const currentChat = computed(() => {
   const chatId = route.query.chatId as string
@@ -191,6 +200,14 @@ watch(
     }
   }
 )
+
+watchEffect(() => {
+  if (resizeWindow.value < 860) {
+    isMobileChat.value = true
+  } else {
+    isMobileChat.value = false
+  }
+})
 
 function handleLike(message: Message) {
   if (message.senderId !== userStore.userState.user?.id) {
@@ -283,6 +300,8 @@ function handleRemoveMessage() {
   width: 100%;
   height: 100%;
   grid-area: chat-content;
+  border-left: 1px solid gray;
+
   .chat {
     width: 100%;
     height: 100%;
@@ -327,6 +346,7 @@ function handleRemoveMessage() {
       padding: 10px;
       position: relative;
       @include scrollbar(4px, black);
+      background-color: white;
       .chat-menu {
         width: 180px;
 
@@ -455,6 +475,14 @@ function handleRemoveMessage() {
         cursor: pointer;
       }
     }
+  }
+  .mobile-chat {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    width: 100%;
+    height: 100%;
   }
 }
 </style>

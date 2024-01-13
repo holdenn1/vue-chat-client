@@ -6,7 +6,7 @@ import MainLayout from 'components/Layouts/MainLayout.vue'
 
 import NotFound from 'components/errors/NotFound.vue'
 import { createRouter, createWebHashHistory } from 'vue-router'
-// import { useUserStore } from '@/store/userStore'
+import { useUserStore } from '@/store/userStore'
 
 const router = createRouter({
   history: createWebHashHistory(import.meta.env.BASE_URL),
@@ -36,8 +36,7 @@ const router = createRouter({
         {
           path: 'chats',
           name: 'chats',
-          component: ChatsPage,
-   
+          component: ChatsPage
         }
       ]
     },
@@ -48,10 +47,10 @@ const router = createRouter({
   ]
 })
 
-// router.beforeEach(async (to) => {
-//   if (useUserStore().userState.user === null && !to.meta.noAuth) {
-//     return { name: 'home' }
-//   }
-// })
+router.beforeEach(async (to) => {
+  if (useUserStore().userState.user === null && !to.meta.noAuth) {
+    return { name: 'home' }
+  }
+})
 
 export default router
