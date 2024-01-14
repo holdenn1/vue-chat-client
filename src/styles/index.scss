@@ -1,13 +1,13 @@
 @import './reset.local.scss';
 @import url('https://fonts.googleapis.com/css2?family=Raleway:wght@400;500;600;700&display=swap');
 
-html {
-  height: -webkit-fill-available;
-}
+// html {
+//   height: -webkit-fill-available;
+// }
 html,
 body {
-  height: 100vh;
-  height: -webkit-fill-available;
+  height: 100dvh;
+  // height: -webkit-fill-available;
   overflow: hidden;
   font-family: 'Raleway', sans-serif;
 

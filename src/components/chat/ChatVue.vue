@@ -17,7 +17,7 @@ const currentMember = ref<User | undefined>()
 <style lang="scss" scoped>
 .chat-wrapper {
   width: 80vw;
-  height: 80vh;
+  height: 80dvh;
   background-color: white;
   border: 1px solid rgb(92, 92, 92);
   border-radius: 12px;
