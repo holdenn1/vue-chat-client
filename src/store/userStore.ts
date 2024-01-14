@@ -9,7 +9,6 @@ import {
   registrationUserRequest
 } from '@/api/requests'
 
-import { deleteCookie } from '@/utils/deleteCookie'
 import { useRouter } from 'vue-router'
 import { AxiosError } from 'axios'
 import type {
