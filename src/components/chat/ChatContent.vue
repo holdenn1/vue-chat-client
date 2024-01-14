@@ -298,7 +298,7 @@ function handleRemoveMessage() {
 @import '@/styles/mixins/d-flex-ctr.scss';
 .chat-content-wrapper {
   width: 100%;
-  height: 100dvh;
+  height: 100%;
   grid-area: chat-content;
   border-left: 1px solid gray;
 
