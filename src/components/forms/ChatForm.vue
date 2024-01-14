@@ -30,7 +30,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: 'edit-message'): void
-  (e: 'send-message'):void
+  (e: 'send-message'): void
 }>()
 
 const { editMessage } = toRefs(props)
@@ -66,7 +66,6 @@ const handleSendMessage = handleSubmit(async ({ message }, { resetForm }) => {
       message
     })
 
-  
     chatStore.sendMessage(data)
     emit('send-message')
     resetForm()

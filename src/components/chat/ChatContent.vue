@@ -309,7 +309,7 @@ function handleRemoveMessage() {
     flex-direction: column;
     .chat-header {
       width: 100%;
-      height: 88.5px;
+      height: 70.5px;
       background-color: rgb(73, 10, 144);
       flex-shrink: 0;
       position: relative;
