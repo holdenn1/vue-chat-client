@@ -8,7 +8,8 @@ html,
 body {
   height: 100vh;
   // height: -webkit-fill-available;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
   font-family: 'Raleway', sans-serif;
 
   background: #3a6a6a;
