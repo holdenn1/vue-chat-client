@@ -2,9 +2,12 @@
   "name": "vue-chat-client",
   "version": "0.0.0",
   "private": true,
+  "homepage": "https://holdenn1.github.io/vue-chat-client/",
   "scripts": {
     "start": "vite",
-    "build": "run-p type-check \"build-only {@}\" --",
+    "build": "run-p type-check build-only",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d dist",
     "preview": "vite preview",
     "build-only": "vite build",
     "type-check": "vue-tsc --noEmit -p tsconfig.app.json --composite false",
@@ -14,6 +17,7 @@
   "dependencies": {
     "@vue/compiler-sfc": "^3.3.4",
     "axios": "^1.5.0",
+    "gh-pages": "^6.1.1",
     "pinia": "^2.1.7",
     "sass-loader": "^13.3.2",
     "socket.io-client": "^4.7.2",

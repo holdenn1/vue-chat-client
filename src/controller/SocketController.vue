@@ -43,7 +43,6 @@ const handleSendMessage = async (sendMessageData: SendMessageSocket) => {
 
 const handleRemoveChat = async (removeChatData: RemoveChatSocket) => {
   if ((window as any)?.socket?.id === removeChatData.socketId) return
-  console.log(removeChatData)
 
   chatStore.removeChat(removeChatData.payload.id)
 }

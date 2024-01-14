@@ -2,7 +2,6 @@
   <div class="submit-btn-wrapper">
     <button :disabled="isSubmitting" class="submit-button" type="submit">
       <span>{{ submitButtonText }}</span>
-
       <slot name="img" />
     </button>
   </div>

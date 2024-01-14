@@ -3,7 +3,7 @@
     <img class="member-avatar" :src="chat.member.photo" alt="" />
     <img
       class="member-menu"
-      @click.stop="() => chatStore.removeChatAction(chat)"
+      @click.stop="() => chatStore.removeChatAction(chat.id)"
       src="@/icons/icons8-remove.svg"
       alt=""
     />
@@ -31,7 +31,7 @@ watchEffect(() => {
   const lastSendMessage = chat.value.messages[0]
   
   if (
-    lastSendMessage.createdDate > chat.value.lastReadMessageDate &&
+    lastSendMessage?.createdDate > chat.value.lastReadMessageDate &&
     lastSendMessage.senderId !== useUserStore().userState.user?.id
   ) {
     hasNewMessages.value = true

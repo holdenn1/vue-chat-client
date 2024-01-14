@@ -21,6 +21,8 @@ import {
 import type { User } from './types/userStoreTypes'
 import { useRoute, useRouter } from 'vue-router'
 
+const LAST_MESSAGE = 1
+
 export const useChatStore = defineStore('chat', () => {
   const chatState = ref<InitialValuesChatStore>({
     isShowChat: false,
@@ -152,9 +154,9 @@ export const useChatStore = defineStore('chat', () => {
     }
   }
 
-  async function removeChatAction(chat: Chat) {
+  async function removeChatAction(id: number) {
     try {
-      const { data }: RemoveChatData = await removeChatRequest(String(chat.id))
+      const { data }: RemoveChatData = await removeChatRequest(String(id))
 
       if (!data) {
         throw new Error()
@@ -226,6 +228,14 @@ export const useChatStore = defineStore('chat', () => {
         String(messageId),
         String(recipientId)
       )
+
+      chatState.value.chats.forEach((chat) => {
+        if (chat.id === data.chatId) {
+          if (chat.messages.length === LAST_MESSAGE) {
+            removeChatAction(chat.id)
+          }
+        }
+      })
 
       removeMessage(data)
     } catch (e) {

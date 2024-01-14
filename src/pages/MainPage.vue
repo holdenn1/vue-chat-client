@@ -21,7 +21,7 @@
 </template>
 
 <script setup lang="ts">
-const GOOGLE_AUTH = 'http://localhost:8000/auth/google/redirect'
+const GOOGLE_AUTH = 'https://vue-chat-server-production.up.railway.app/auth/google/redirect'
 </script>
 
 <style lang="scss" scoped>
