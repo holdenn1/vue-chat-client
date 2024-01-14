@@ -51,6 +51,7 @@ const GOOGLE_AUTH = 'https://vue-chat-server-production.up.railway.app/auth/goog
       border: 2px solid #11276a;
       margin: 10px;
       @include flexCenter;
+      text-align: center;
       width: 240px;
       padding: 12px 10px;
       border-radius: 12px;

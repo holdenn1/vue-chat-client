@@ -5,6 +5,7 @@ import globalRouter from '@/router/globalRouter'
 import { deleteCookie } from '@/utils/deleteCookie'
 
 export const BASE_URL = 'https://vue-chat-server-production.up.railway.app/'
+// export const BASE_URL = 'http://localhost:8000/'
 
 const instance = axios.create({
   baseURL: BASE_URL,
