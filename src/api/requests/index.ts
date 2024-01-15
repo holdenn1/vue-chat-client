@@ -8,8 +8,8 @@ import type {
   UpdateMessageData
 } from './types'
 
-// export const BASE_URL = 'https://vue-chat-server-production.up.railway.app/'
-export const BASE_URL = 'http://localhost:8000/'
+export const BASE_URL = 'https://vue-chat-server-production.up.railway.app/'
+// export const BASE_URL = 'http://localhost:8000/'
 
 export const registrationUserRequest = (data: RegistrationUserData) =>
   instance.post('auth/registration', data)
