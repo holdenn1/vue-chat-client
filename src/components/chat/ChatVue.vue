@@ -32,11 +32,12 @@ const currentMember = ref<User | undefined>()
     'chat-bar chat-content';
   position: relative;
 
-  @media screen and (max-width: 860px) {
+  @media screen and (max-width: 859px) {
     grid-template-columns: minmax(200px, 860px);
     grid-template-areas:
       'chat-bar'
       'chat-bar';
+      
     margin: 0 10px;
   }
   @media screen and (max-width: 520px) {

@@ -62,6 +62,7 @@ export const useChatStore = defineStore('chat', () => {
     const { data }: { data: Chat[] } = await fetchChatsRequest(
       String(chatState.value.currentChatsPage)
     )
+    console.log(data)
 
     if (data.length) {
       const oldChats = chatState.value.chats.map((chat) => chat.id)
@@ -87,6 +88,8 @@ export const useChatStore = defineStore('chat', () => {
       }
 
       if (data.chat.members) {
+        const hasChat = chatState.value.chats.find((chat) => chat.id === data.chat.id)
+        if (hasChat) return
         chatState.value.chats.unshift({
           id: data.chat.id,
           member: data.chat.members.find((user) => user.id !== useUserStore().userState.user?.id),
@@ -252,7 +255,7 @@ export const useChatStore = defineStore('chat', () => {
     })
   }
 
-  function clearChatList(){
+  function clearChatList() {
     chatState.value.chats = []
   }
 

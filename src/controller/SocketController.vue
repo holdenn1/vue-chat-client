@@ -20,7 +20,8 @@ const chatStore = useChatStore()
 
 onMounted(() => {
   const manager = new Manager(BASE_URL, {
-    transports: ['websocket']
+    transports: ['websocket'],
+    reconnectionAttempts: 20
   })
   const socket = manager.socket('/')
   ;(window as any).socket = socket
@@ -37,6 +38,7 @@ onMounted(() => {
 
 const handleSendMessage = async (sendMessageData: SendMessageSocket) => {
   if ((window as any)?.socket?.id === sendMessageData.socketId) return
+  console.log('s', sendMessageData)
 
   chatStore.sendMessage(sendMessageData.payload)
 }
