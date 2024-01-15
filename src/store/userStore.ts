@@ -17,6 +17,7 @@ import type {
   RegistrationUserActionProps,
   User
 } from './types/userStoreTypes'
+import { useChatStore } from './chatStore'
 
 export const useUserStore = defineStore('user', () => {
   const router = useRouter()
@@ -66,6 +67,7 @@ export const useUserStore = defineStore('user', () => {
     try {
       await logoutUserRequest()
       userState.value.user = null
+      useChatStore().clearChatList()
       router.push({ path: '/' })
     } catch (e) {
       toastify('error', 'An error occurred')

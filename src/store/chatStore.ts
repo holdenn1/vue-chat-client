@@ -252,6 +252,10 @@ export const useChatStore = defineStore('chat', () => {
     })
   }
 
+  function clearChatList(){
+    chatState.value.chats = []
+  }
+
   function setCurrentMessagesPage(page: number) {
     chatState.value.currentMessagesPage = page
   }
@@ -273,6 +277,7 @@ export const useChatStore = defineStore('chat', () => {
     fetchMessages,
     removeMessage,
     setLikeAction,
+    clearChatList,
     removeChatAction,
     editMessageAction,
     updateUserOnSocket,
