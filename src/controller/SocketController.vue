@@ -38,7 +38,6 @@ onMounted(() => {
 
 const handleSendMessage = async (sendMessageData: SendMessageSocket) => {
   if ((window as any)?.socket?.id === sendMessageData.socketId) return
-  console.log('s', sendMessageData)
 
   chatStore.sendMessage(sendMessageData.payload)
 }

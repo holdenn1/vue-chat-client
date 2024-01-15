@@ -99,6 +99,11 @@ export const useChatStore = defineStore('chat', () => {
           messages: [data.message]
         } as Chat)
       } else {
+        const hasMessage = chatState.value.chats.find((chat) =>
+          chat.messages.find((message) => message.id === data.message.id)
+        )
+
+        if (hasMessage) return
         chatState.value.chats = chatState.value.chats.map((chat) => {
           if (chat.id === data.message.chatId) {
             chat.messages.unshift(data.message)
