@@ -2,7 +2,7 @@
   <div class="user-bar">
     <input class="upload-photo-input" type="file" @change="handleFileInputChange" />
     <img class="user-avatar" :src="userStore.userState.user?.photo" alt="" />
-    <img class="logout" src="@/icons/logout.png" alt=""  @click="userStore.logoutUser()"/>
+    <img class="logout" src="@/icons/logout.png" alt="" @click="userStore.logoutUser()"/>
     <h4 class="user-name">
       <span
         :title="userStore.userState.user?.nickname"
