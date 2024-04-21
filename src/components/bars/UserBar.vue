@@ -61,15 +61,13 @@ const updateNickname = async () => {
       toastify('warning', 'Nickname must be longer than 3 characters')
       return
     }
-
-
-
     const { data }: { data: User } = await updateUserRequest({ nickname: trimNickname })
     if (!data) {
       throw new Error()
     }
 
-    console.log(10000)
+
+    console.log(203333000000)
     userStore.setUser(data)
   } catch (e) {
     console.error(e)
