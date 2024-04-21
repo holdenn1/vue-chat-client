@@ -68,6 +68,7 @@ const updateNickname = async () => {
 
 
     console.log(203333000000)
+    console.log(111111111111)
     userStore.setUser(data)
   } catch (e) {
     console.error(e)
